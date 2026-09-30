@@ -1,0 +1,53 @@
+'use strict';
+const $=id=>document.getElementById(id), KEY='packet-panic-v1';
+const INTERVAL_MS={A:900,B:650,C:200,C100:100,C200:200,C400:400};
+const empty=()=>({version:1,cIntervalMs:200,records:[],mute:true,motion:matchMedia('(prefers-reduced-motion: reduce)').matches,finalMode:'',reason:''});
+function validRecord(r){return r&&['A','B','C','C100','C200','C400','practice'].includes(r.mode)&&['success','failure'].includes(r.result)&&['score','elapsed','miss','wrong','round'].every(k=>Number.isFinite(r[k])&&r[k]>=0)&&r.elapsed<=30&&typeof r.cause==='string';}
+function readStorage(){try{const raw=localStorage.getItem(KEY);if(!raw)return empty();const v=JSON.parse(raw);if(!v||v.version!==1||!Array.isArray(v.records)||!v.records.every(validRecord)||typeof v.mute!=='boolean'||typeof v.motion!=='boolean'||!['','A','B','C','C100','C200','C400'].includes(v.finalMode)||typeof v.reason!=='string')throw Error('invalid');if(v.cIntervalMs!==200||v.records.some(r=>r.mode==='C200'||r.difficulty==='C200')){const previous=v.cIntervalMs===100?100:v.cIntervalMs===400?400:200;v.records=v.records.map(r=>{if(r.mode==='C200'||r.difficulty==='C200'||((r.mode==='C'||r.difficulty==='C')&&r.intervalMs===200)){return {...r,mode:r.mode==='practice'?'practice':'C',difficulty:'C',intervalMs:200};}if(r.mode==='C'||r.difficulty==='C'){const ms=r.intervalMs===100?100:r.intervalMs===400?400:previous;if(ms!==200)return {...r,mode:r.mode==='C'?'C'+ms:r.mode,difficulty:'C'+ms,intervalMs:ms};}return r;});if(v.finalMode==='C')v.finalMode=previous===200?'C':'C'+previous;else if(v.finalMode==='C200')v.finalMode='C';v.cIntervalMs=200;}return v;}catch{return empty();}}
+let saved=readStorage(), state='ready', packets=[], elapsed=0, spawnAt=0, hp=100, score=0, miss=0, wrong=0, last=0, mode='practice', round=1, rng, id=0, audio, difficulty='A', recordMode='practice';
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(saved));$('storageNotice').textContent='기록은 현재 브라우저에 저장된다.';}catch{$('storageNotice').textContent='브라우저 저장소를 사용할 수 없다. 기록 내보내기를 이용하여 별도로 보관할 수 있다.';}}
+function seeded(seed){let x=seed;return()=>{x=(Math.imul(x,1664525)+1013904223)>>>0;return x/4294967296;};}
+for(let i=0;i<4;i++){const l=document.createElement('div');l.className='lane';l.id='lane'+i;$('lanes').append(l);}
+function counts(m){return saved.records.filter(r=>r.mode===m);}
+function renderRecords(){const a=counts('A'),b=counts('B'),c=counts('C');$('recordCount').textContent=`A ${a.length}/10 · B ${b.length}/10 · C ${c.length}/10`;$('rows').replaceChildren();for(const r of saved.records.slice().reverse()){const tr=document.createElement('tr');for(const text of [r.mode==='practice'?`자유 플레이${r.difficulty?' · '+r.difficulty:''}`:`${r.mode} / ${r.round}`,r.result==='success'?'성공':'실패',r.score,r.elapsed.toFixed(1)+'초',r.miss,r.wrong,r.cause]){const td=document.createElement('td');td.textContent=text;tr.append(td);}$('rows').append(tr);}$('stats').replaceChildren();for(const [m,rs]of[['A',a],['B',b],['C',c],...['C100','C400'].filter(m=>counts(m).length).map(m=>[m,counts(m)])]){const sorted=rs.map(r=>r.score).sort((a,b)=>a-b),n=sorted.length;const median=n?(sorted[Math.floor((n-1)/2)]+sorted[Math.floor(n/2)])/2:'—';const d=document.createElement('div');d.className='stat';d.textContent=`${m} · ${INTERVAL_MS[m]}ms / ${rs.length}판 / 성공 ${rs.filter(r=>r.result==='success').length}회 / 점수 중앙값 ${median}`;$('stats').append(d);}}
+$('mute').checked=saved.mute;$('motion').checked=saved.motion;$('finalMode').value=saved.finalMode;$('reason').value=saved.reason;
+function tone(){if(saved.mute)return;try{audio??=new(window.AudioContext||window.webkitAudioContext)();audio.resume().catch(()=>{});const o=audio.createOscillator(),g=audio.createGain();o.connect(g);g.connect(audio.destination);o.frequency.setValueAtTime(660,audio.currentTime);o.frequency.exponentialRampToValueAtTime(980,audio.currentTime+.07);g.gain.setValueAtTime(.045,audio.currentTime);g.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.1);o.start();o.stop(audio.currentTime+.11);}catch{}}
+function updateHud(){$('time').textContent=Math.max(0,30-elapsed).toFixed(1);$('score').textContent=String(score).padStart(3,'0');$('health').textContent=hp+'%';$('healthbar').style.width=hp+'%';$('healthbar').style.background=hp<=40?'#ff9b7c':'#8dfa93';}
+function setState(s){state=s;$('status').textContent=({ready:'시작 대기',playing:'방어 중',paused:'일시정지',success:'방어 성공',failure:'서버 침해'})[s];$('pause').disabled=!['playing','paused'].includes(s);$('pause').textContent=s==='paused'?'▶ 재개':'Ⅱ 일시정지';$('mode').disabled=['playing','paused'].includes(s);}
+function refreshFinalMode(){
+  $('finalPlay').disabled=!saved.finalMode;
+  $('finalPlay').textContent=saved.finalMode?`최종 난이도 · ${saved.finalMode} · ${INTERVAL_MS[saved.finalMode]}ms`:'최종 난이도 · 판단 저장 후 사용 가능';
+}
+refreshFinalMode();
+if(saved.finalMode)$('mode').value='final';
+function start(){
+  mode=$('mode').value;
+  if(mode==='final'&&!saved.finalMode){$('feedback').textContent='최종 난이도 선택과 근거를 먼저 저장해야 한다.';return;}
+  difficulty=mode==='final'?saved.finalMode:(INTERVAL_MS[mode]?mode:'A');
+  recordMode=['A','B','C'].includes(mode)&&counts(mode).length<10?mode:'practice';
+  round=counts(recordMode).length+1;
+  packets.forEach(p=>p.el.remove());packets=[];elapsed=0;spawnAt=0;hp=100;score=0;miss=0;wrong=0;id=0;
+  rng=seeded(recordMode==='practice'?Date.now()>>>0:round*719);
+  last=performance.now();setState('playing');$('overlay').hidden=true;
+  $('feedback').textContent=recordMode==='practice'?
+    `자유 플레이 · ${difficulty} · ${INTERVAL_MS[difficulty]}ms — 비교 기록에는 포함되지 않는다.`:
+    `비교 ${recordMode} ${round}/10 · 경고 패킷만 차단한다.`;
+  updateHud();
+}
+function finish(){setState(hp>0?'success':'failure');const cause=hp>0?'—':miss>wrong?'공격 놓침':wrong>miss?'정상 오차단':'놓침 + 오차단';saved.records.push({mode:recordMode,difficulty,intervalMs:INTERVAL_MS[difficulty],round,result:state,score,elapsed:Number(elapsed.toFixed(3)),miss,wrong,cause});// Keep experiment records independently from the bounded free-play history.
+const keepPractice=new Set(saved.records.filter(r=>r.mode==='practice').slice(-500));
+saved.records=saved.records.filter(r=>r.mode!=='practice'||keepPractice.has(r));persist();renderRecords();$('headline').textContent=hp>0?'방어 성공!':'서버 침해';$('message').textContent=`${score}점 · ${elapsed.toFixed(1)}초 · 놓침 ${miss}회 · 오차단 ${wrong}회`;$('start').textContent='다시 시작 ↗';$('overlay').hidden=false;}
+function pause(){if(state==='playing'){setState('paused');$('headline').textContent='일시정지';$('message').textContent='시간과 패킷 이동이 정지된다. 재개하면 현재 상태에서 이어서 진행된다.';$('start').textContent='방어 재개 ↗';$('overlay').hidden=false;}else if(state==='paused'){setState('playing');last=performance.now();$('overlay').hidden=true;}}
+function remove(p){p.el.remove();packets=packets.filter(x=>x!==p);}
+function hit(p){if(state!=='playing'||!packets.includes(p))return;remove(p);if(p.bad){score+=100;$('feedback').textContent='차단 성공 +100 · '+p.label;tone();}else{wrong++;hp=Math.max(0,hp-20);$('feedback').textContent='정상 패킷 오차단 · 무결성 −20';}updateHud();if(hp===0)finish();}
+function spawn(){const lane=id%4,bad=rng()<.55,protocol=['HTTPS','DNS','SSH'][Math.floor(rng()*3)],label=bad?['서명 오류','요청 폭주','차단 목록'][Math.floor(rng()*3)]:'검증 완료';const el=document.createElement('button');el.className='packet'+(bad?' bad':'');el.innerHTML=`<b>${protocol} <span>#${String(id+1).padStart(2,'0')}</span></b><small>${bad?'!':'✓'} ${label}</small><progress max="1" value="0" aria-label="서버 도착 진행률"></progress>`;el.setAttribute('aria-label',`${protocol} ${label}, 클릭하여 차단`);const p={id:id++,lane,bad,label,el,born:spawnAt};el.addEventListener('click',()=>hit(p));$('lane'+lane).append(el);packets.push(p);}
+function position(p){const t=Math.min(1,(elapsed-p.born)/4),width=$('lane'+p.lane).clientWidth-p.el.offsetWidth;p.el.style.left=(saved.motion?Math.min(width,(Math.floor(p.id/4)%11)*width/10):Math.max(0,width*t))+'px';p.el.querySelector('progress').value=t;}
+function tick(now){if(state==='playing'){elapsed=Math.min(30,elapsed+Math.max(0,(now-last)/1000));while(spawnAt<=elapsed&&spawnAt<26){spawn();spawnAt+=INTERVAL_MS[difficulty]/1000;}for(const p of [...packets]){if(elapsed-p.born>=4){remove(p);if(p.bad){miss++;hp=Math.max(0,hp-20);$('feedback').textContent='공격 패킷이 서버에 도착함 · 무결성 −20';if(hp===0)break;}}else position(p);}updateHud();if(hp===0||elapsed>=30)finish();}last=now;requestAnimationFrame(tick);}
+$('start').onclick=()=>state==='paused'?pause():start();$('pause').onclick=pause;
+window.addEventListener('blur',()=>{if(state==='playing')pause();});document.addEventListener('visibilitychange',()=>{if(document.hidden&&state==='playing')pause();});window.addEventListener('resize',()=>packets.forEach(position));document.addEventListener('keydown',e=>{if(e.code==='Escape'&&!e.repeat&&['playing','paused'].includes(state)){e.preventDefault();pause();}});
+$('mute').onchange=()=>{saved.mute=$('mute').checked;if(saved.mute&&audio)audio.suspend().catch(()=>{});persist();};$('motion').onchange=()=>{saved.motion=$('motion').checked;packets.forEach(position);persist();};
+$('saveDecision').onclick=()=>{if(!$('finalMode').value||!$('reason').value.trim()){$('saved').textContent='최종 난이도와 선택 근거를 모두 입력해야 한다.';return;}saved.finalMode=$('finalMode').value;saved.reason=$('reason').value.trim();persist();refreshFinalMode();$('mode').value='final';$('saved').textContent='최종 난이도가 저장되었다. 이후 플레이부터 선택한 설정이 적용된다.';};
+$('clear').onclick=()=>{if(['playing','paused'].includes(state)){$('saved').textContent='진행 중인 판을 종료한 뒤 기록을 초기화할 수 있다.';return;}if(confirm('완료 기록과 최종 판단을 삭제하시겠습니까? 삭제된 기록은 복구할 수 없습니다.')){saved.records=[];saved.finalMode='';saved.reason='';refreshFinalMode();$('mode').value='practice';$('finalMode').value='';$('reason').value='';persist();renderRecords();$('saved').textContent='기록이 초기화되었다.';}};
+$('export').onclick=()=>{const blob=new Blob([JSON.stringify(saved,null,2)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='packet-panic-records.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);};
+if(document.modelContext?.registerTool){try{Promise.resolve(document.modelContext.registerTool({name:'read_defense_status',description:'Read current game status and locally recorded comparison counts without changing the game.',inputSchema:{type:'object',properties:{},additionalProperties:false},annotations:{readOnlyHint:true},execute(input){if(input&&Object.keys(input).length)throw Error('No arguments allowed');return {state,elapsed,hp,score,A:counts('A').length,B:counts('B').length,C:counts('C').length};}})).catch(()=>{});}catch{}}
+renderRecords();updateHud();requestAnimationFrame(tick);
