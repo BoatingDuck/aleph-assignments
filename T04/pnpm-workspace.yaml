@@ -1,21 +1,30 @@
-# Copied Sites are standalone projects and cannot inherit the monorepo policy.
-minimumReleaseAge: 10080
+packages:
+  - "."
+
+minimumReleaseAge: 0
 minimumReleaseAgeIgnoreMissingTime: false
+
 trustLockfile: false
 strictDepBuilds: true
+
 allowBuilds:
   esbuild: true
   fsevents: true
   sharp: true
   unrs-resolver: true
   workerd: true
+
 storeDir: ${SITES_PNPM_SHARED_STORE:-.sites-runtime/pnpm-store}
 cacheDir: ${SITES_PNPM_SHARED_STORE:-.sites-runtime/pnpm-store}/policy-cache
+
 enableGlobalVirtualStore: false
-# Reuse store files with clones or hardlinks before falling back to copies.
+
+# 가능하면 복제(clone) 또는 하드링크를 사용해 저장소 파일을 재사용하고, 불가능한 경우 파일 복사 방식으로 처리
 packageImportMethod: auto
-# The explicit installer owns dependency setup, including restored workspaces.
+
+# 명시적인 설치 과정이 의존성 설정과 복원된 워크스페이스 처리를 담당
 verifyDepsBeforeRun: false
 optimisticRepeatInstall: false
+
 overrides:
   miniflare>sharp: 0.35.4
