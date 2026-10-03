@@ -917,3 +917,13 @@ input[type="range"]::-moz-range-thumb {
 .control-block + .control-block {
   margin-top: 0;
 }
+
+
+.history-controls {
+  flex-wrap: wrap;
+}
+
+.history-controls button:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
