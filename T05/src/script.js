@@ -29,6 +29,8 @@
     downloadBtn: document.getElementById("downloadBtn"),
     downloadMessage: document.getElementById("downloadMessage"),
     resetBtn: document.getElementById("resetBtn"),
+    undoBtn: document.getElementById("undoBtn"),
+    redoBtn: document.getElementById("redoBtn"),
     rightsType: document.getElementById("rightsType"),
     externalRightsFields: document.getElementById("externalRightsFields"),
     sourceUrl: document.getElementById("sourceUrl"),
@@ -70,6 +72,12 @@
 
   let templates = loadArray(STORAGE_KEY);
   let history = loadArray(HISTORY_KEY);
+
+  // 편집 Undo/Redo 이력은 의도적으로 메모리에만 둔다.
+  // 새로고침하면 초기화되어 이전 실행의 편집 이력이 남지 않는다.
+  let undoStack = [];
+  let redoStack = [];
+  let restoringEditHistory = false;
 
   function loadArray(key) {
     try {
@@ -327,6 +335,7 @@
     }
 
     try {
+      const previous = editableSnapshot();
       // 중요: 새 파일을 완전히 읽고 검증한 뒤에만 state를 변경한다.
       const sanitized = await fileToSanitizedDataUrl(file);
       const loaded = await loadImage(sanitized.dataUrl);
@@ -336,6 +345,7 @@
       state.imageName = file.name;
       state.imageObject = loaded;
       renderCanvas();
+      recordEdit(previous);
 
       setMessage(
         els.fileMessage,
@@ -347,6 +357,114 @@
     } finally {
       els.imageInput.value = "";
     }
+  }
+
+  function editableSnapshot() {
+    return {
+      ratio: state.ratio,
+      text: state.text,
+      x: Number(state.x),
+      y: Number(state.y),
+      fontSize: Number(state.fontSize),
+      color: state.color,
+      imageDataUrl: state.imageDataUrl,
+      imageMime: state.imageMime,
+      imageName: state.imageName,
+      rights: {
+        type: state.rights.type,
+        sourceUrl: state.rights.sourceUrl,
+        licenseInfo: state.rights.licenseInfo
+      },
+      selectedTemplateId: state.selectedTemplateId
+    };
+  }
+
+  function snapshotsEqual(a, b) {
+    return JSON.stringify(a) === JSON.stringify(b);
+  }
+
+  function updateEditHistoryButtons() {
+    els.undoBtn.disabled = undoStack.length === 0;
+    els.redoBtn.disabled = redoStack.length === 0;
+  }
+
+  function recordEdit(previous) {
+    if (restoringEditHistory) return;
+    const current = editableSnapshot();
+    if (snapshotsEqual(previous, current)) return;
+    undoStack.push(previous);
+    redoStack = [];
+    updateEditHistoryButtons();
+  }
+
+  function withEditSnapshot(fn) {
+    const previous = editableSnapshot();
+    fn();
+    recordEdit(previous);
+  }
+
+  async function restoreEditableSnapshot(snapshot) {
+    let loaded = null;
+    if (snapshot.imageDataUrl) loaded = await loadImage(snapshot.imageDataUrl);
+    Object.assign(state, {
+      ratio: snapshot.ratio,
+      text: snapshot.text,
+      x: snapshot.x,
+      y: snapshot.y,
+      fontSize: snapshot.fontSize,
+      color: snapshot.color,
+      imageDataUrl: snapshot.imageDataUrl,
+      imageMime: snapshot.imageMime,
+      imageName: snapshot.imageName,
+      imageObject: loaded,
+      rights: { ...snapshot.rights },
+      selectedTemplateId: snapshot.selectedTemplateId
+    });
+    syncControlsFromState();
+    applyRatio();
+    renderTemplateList();
+  }
+
+  async function undoEdit() {
+    if (!undoStack.length || restoringEditHistory) return;
+    const current = editableSnapshot();
+    const target = undoStack.pop();
+    redoStack.push(current);
+    restoringEditHistory = true;
+    try {
+      await restoreEditableSnapshot(target);
+    } catch (e) {
+      undoStack.push(target);
+      redoStack.pop();
+      setMessage(els.fileMessage, `실행 취소에 실패했습니다: ${e.message}`, "error");
+    } finally {
+      restoringEditHistory = false;
+      updateEditHistoryButtons();
+    }
+  }
+
+  async function redoEdit() {
+    if (!redoStack.length || restoringEditHistory) return;
+    const current = editableSnapshot();
+    const target = redoStack.pop();
+    undoStack.push(current);
+    restoringEditHistory = true;
+    try {
+      await restoreEditableSnapshot(target);
+    } catch (e) {
+      redoStack.push(target);
+      undoStack.pop();
+      setMessage(els.fileMessage, `다시 실행에 실패했습니다: ${e.message}`, "error");
+    } finally {
+      restoringEditHistory = false;
+      updateEditHistoryButtons();
+    }
+  }
+
+  function clearEditHistory() {
+    undoStack = [];
+    redoStack = [];
+    updateEditHistoryButtons();
   }
 
   function currentTemplatePayload(id = uuid(), name = "") {
@@ -491,8 +609,10 @@
   async function loadTemplate(id) {
     const t = templates.find(item => item.id === id);
     if (!t) return;
+    const previous = editableSnapshot();
     try {
       await applyTemplateToState(t);
+      recordEdit(previous);
       els.templateName.value = t.name;
       els.updateTemplateBtn.disabled = false;
       setMessage(els.templateMessage, `'${t.name}' 템플릿을 불러왔습니다.`, "success");
@@ -778,6 +898,7 @@
   }
 
   function resetEditor() {
+    const previous = editableSnapshot();
     state.ratio = "1:1";
     state.text = "오늘도 한 칸씩 앞으로";
     state.x = 50;
@@ -799,6 +920,7 @@
     setMessage(els.downloadMessage, "");
     setMessage(els.templateMessage, "새 작업을 시작했습니다. 저장된 템플릿은 그대로 유지됩니다.");
     renderTemplateList();
+    recordEdit(previous);
   }
 
   els.imageInput.addEventListener("change", e => handleImageFile(e.target.files?.[0]));
@@ -826,55 +948,89 @@
   });
 
   els.captionInput.addEventListener("input", e => {
+    const previous = editableSnapshot();
     state.text = e.target.value;
     renderCanvas();
+    recordEdit(previous);
   });
 
   els.xRange.addEventListener("input", e => {
+    const previous = editableSnapshot();
     state.x = Number(e.target.value);
     els.xValue.value = `${state.x}%`;
     renderCanvas();
+    recordEdit(previous);
   });
 
   els.yRange.addEventListener("input", e => {
+    const previous = editableSnapshot();
     state.y = Number(e.target.value);
     els.yValue.value = `${state.y}%`;
     renderCanvas();
+    recordEdit(previous);
   });
 
   els.sizeRange.addEventListener("input", e => {
+    const previous = editableSnapshot();
     state.fontSize = Number(e.target.value);
     els.sizeValue.value = `${state.fontSize}px`;
     renderCanvas();
+    recordEdit(previous);
   });
 
   els.colorInput.addEventListener("input", e => {
+    const previous = editableSnapshot();
     state.color = e.target.value;
     renderCanvas();
+    recordEdit(previous);
   });
 
   els.ratioButtons.forEach(btn => {
     btn.addEventListener("click", () => {
+      const previous = editableSnapshot();
       state.ratio = btn.dataset.ratio;
       syncControlsFromState();
       applyRatio();
+      recordEdit(previous);
     });
   });
 
   els.rightsType.addEventListener("change", e => {
+    const previous = editableSnapshot();
     state.rights.type = e.target.value;
     els.externalRightsFields.hidden = state.rights.type !== "external";
     updateRightsStatus();
+    recordEdit(previous);
   });
 
   els.sourceUrl.addEventListener("input", e => {
+    const previous = editableSnapshot();
     state.rights.sourceUrl = e.target.value.trim();
     updateRightsStatus();
+    recordEdit(previous);
   });
 
   els.licenseInfo.addEventListener("input", e => {
+    const previous = editableSnapshot();
     state.rights.licenseInfo = e.target.value.trim();
     updateRightsStatus();
+    recordEdit(previous);
+  });
+
+  els.undoBtn.addEventListener("click", undoEdit);
+  els.redoBtn.addEventListener("click", redoEdit);
+
+  document.addEventListener("keydown", e => {
+    const modifier = e.ctrlKey || e.metaKey;
+    if (!modifier || e.altKey) return;
+    if (e.key.toLowerCase() === "z") {
+      e.preventDefault();
+      if (e.shiftKey) redoEdit();
+      else undoEdit();
+    } else if (e.key.toLowerCase() === "y") {
+      e.preventDefault();
+      redoEdit();
+    }
   });
 
   els.downloadBtn.addEventListener("click", downloadImage);
@@ -892,4 +1048,5 @@
   applyRatio();
   renderTemplateList();
   renderHistory();
+  updateEditHistoryButtons();
 })();
