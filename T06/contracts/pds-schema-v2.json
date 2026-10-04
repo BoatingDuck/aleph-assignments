@@ -1,0 +1,118 @@
+{
+  "contract": "pds-schema-v2",
+  "version": 2,
+  "database": "PostgreSQL",
+  "timezonePolicy": {
+    "timestampStorage": "TIMESTAMPTZ; PostgreSQL/Neon stores absolute instants and the app renders them in Asia/Seoul.",
+    "dateOnlyStorage": "DATE; plan periods and task due dates are calendar dates without time-of-day.",
+    "delayRule": "A task is delayed only when deleted_at is null, status is not done, and due_date is earlier than today's DATE in Asia/Seoul.",
+    "durationUnit": "minutes as non-negative integer"
+  },
+  "tables": {
+    "plans": {
+      "primaryKey": "id uuid",
+      "fields": {
+        "title": "text not null",
+        "start_date": "date not null",
+        "end_date": "date not null",
+        "priority": "text: low|medium|high",
+        "success_criteria": "text not null",
+        "estimated_minutes": "integer >= 0",
+        "improvement_from_previous": "text nullable",
+        "source_plan_id": "uuid nullable -> plans.id",
+        "created_at": "timestamptz",
+        "updated_at": "timestamptz"
+      }
+    },
+    "plan_versions": {
+      "primaryKey": "id uuid",
+      "relation": "many versions -> one plans.id",
+      "fields": {
+        "plan_id": "uuid -> plans.id",
+        "version_no": "integer",
+        "snapshot": "jsonb containing the complete pre-edit plan fields",
+        "created_at": "timestamptz"
+      },
+      "unique": [
+        "plan_id",
+        "version_no"
+      ]
+    },
+    "tasks": {
+      "primaryKey": "id uuid",
+      "relation": "many tasks -> one plans.id",
+      "fields": {
+        "plan_id": "uuid -> plans.id",
+        "title": "text not null",
+        "due_date": "date nullable",
+        "priority": "text: low|medium|high",
+        "tags": "text[]",
+        "estimated_minutes": "integer >= 0",
+        "status": "text: todo|doing|done",
+        "completion_cycle": "integer >= 0; increments when a completed task is reopened",
+        "completed_at": "timestamptz nullable",
+        "deleted_at": "timestamptz nullable; soft delete",
+        "created_at": "timestamptz",
+        "updated_at": "timestamptz"
+      }
+    },
+    "task_completions": {
+      "primaryKey": "id uuid",
+      "purpose": "Database-level duplicate-completion guard.",
+      "fields": {
+        "task_id": "uuid -> tasks.id",
+        "completion_cycle": "integer",
+        "idempotency_key": "text unique",
+        "completed_at": "timestamptz"
+      },
+      "unique": [
+        "task_id",
+        "completion_cycle"
+      ]
+    },
+    "idempotency_keys": {
+      "primaryKey": "key text",
+      "fields": {
+        "scope": "text",
+        "created_at": "timestamptz"
+      }
+    },
+    "execution_logs": {
+      "primaryKey": "id uuid",
+      "relation": "many execution logs -> one tasks.id",
+      "fields": {
+        "task_id": "uuid -> tasks.id",
+        "started_at": "timestamptz",
+        "ended_at": "timestamptz",
+        "actual_minutes": "integer >= 0",
+        "blocker_reason": "text nullable",
+        "created_at": "timestamptz"
+      }
+    },
+    "reflections": {
+      "primaryKey": "id uuid",
+      "fields": {
+        "plan_id": "uuid -> plans.id",
+        "improvement_text": "text not null",
+        "carried_to_plan_id": "uuid nullable -> plans.id",
+        "created_at": "timestamptz"
+      }
+    },
+    "security_checks": {
+      "primaryKey": "id uuid",
+      "purpose": "Stores script-shaped text for C57 rendering safety verification; React renders it as text, never HTML.",
+      "fields": {
+        "content": "text not null",
+        "created_at": "timestamptz"
+      }
+    }
+  },
+  "relationships": [
+    "plans 1:N plan_versions",
+    "plans 1:N tasks",
+    "tasks 1:N execution_logs",
+    "tasks 1:N task_completions across completion cycles",
+    "plans 1:N reflections",
+    "reflections 0..1:1 carried next plans"
+  ]
+}
