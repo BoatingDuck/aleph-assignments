@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 import { asNonNegativeInt } from "@/lib/pds";
 
@@ -9,46 +10,102 @@ type RouteContext = { params: Promise<{ id: string }> };
 
 export async function GET(_: Request, context: RouteContext) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { ok: false, error: "로그인이 필요합니다." },
+        { status: 401 }
+      );
+    }
+
     const { id } = await context.params;
     const sql = getSql();
-    const plans = await sql`SELECT * FROM plans WHERE id = ${id}`;
-    if (!plans[0]) return NextResponse.json({ ok: false, error: "계획이 없습니다." }, { status: 404 });
-    const versions = await sql`
-      SELECT id, plan_id, version_no, snapshot, created_at
-      FROM plan_versions
-      WHERE plan_id = ${id}
-      ORDER BY version_no DESC
+
+    const plans = await sql`
+      SELECT *
+      FROM plans
+      WHERE id = ${id}
+        AND user_id = ${user.id}
+      LIMIT 1
     `;
-    return NextResponse.json({ ok: true, plan: plans[0], versions });
-  } catch (error) {
-    return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "계획을 불러오지 못했습니다." }, { status: 500 });
+
+    if (!plans[0]) {
+      return NextResponse.json(
+        { ok: false, error: "계획이 없습니다." },
+        { status: 404 }
+      );
+    }
+
+    const versions = await sql`
+      SELECT v.id, v.plan_id, v.version_no, v.snapshot, v.created_at
+      FROM plan_versions v
+      JOIN plans p ON p.id = v.plan_id
+      WHERE v.plan_id = ${id}
+        AND p.user_id = ${user.id}
+      ORDER BY v.version_no DESC
+    `;
+
+    return NextResponse.json({
+      ok: true,
+      plan: plans[0],
+      versions,
+    });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "계획을 불러오지 못했습니다." },
+      { status: 500 }
+    );
   }
 }
 
 export async function PATCH(request: Request, context: RouteContext) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { ok: false, error: "로그인이 필요합니다." },
+        { status: 401 }
+      );
+    }
+
     const { id } = await context.params;
     const body = await request.json();
     const title = String(body.title ?? "").trim();
     const successCriteria = String(body.successCriteria ?? "").trim();
     const startDate = String(body.startDate ?? "");
     const endDate = String(body.endDate ?? "");
-    const priority = ["low", "medium", "high"].includes(body.priority) ? body.priority : "medium";
+    const priority = ["low", "medium", "high"].includes(body.priority)
+      ? body.priority
+      : "medium";
     const estimatedMinutes = asNonNegativeInt(body.estimatedMinutes);
 
     if (!title || !successCriteria || !startDate || !endDate) {
-      return NextResponse.json({ ok: false, error: "제목·기간·성공 기준은 필수입니다." }, { status: 400 });
+      return NextResponse.json(
+        { ok: false, error: "제목·기간·성공 기준은 필수입니다." },
+        { status: 400 }
+      );
     }
 
     const sql = getSql();
+
     const rows = await sql`
       WITH current_plan AS (
-        SELECT * FROM plans WHERE id = ${id}
+        SELECT *
+        FROM plans
+        WHERE id = ${id}
+          AND user_id = ${user.id}
       ), history AS (
         INSERT INTO plan_versions (plan_id, version_no, snapshot)
         SELECT
           c.id,
-          COALESCE((SELECT max(v.version_no) FROM plan_versions v WHERE v.plan_id = c.id), 0) + 1,
+          COALESCE(
+            (
+              SELECT max(v.version_no)
+              FROM plan_versions v
+              WHERE v.plan_id = c.id
+            ),
+            0
+          ) + 1,
           jsonb_build_object(
             'title', c.title,
             'start_date', c.start_date,
@@ -70,27 +127,51 @@ export async function PATCH(request: Request, context: RouteContext) {
           success_criteria = ${successCriteria},
           estimated_minutes = ${estimatedMinutes},
           updated_at = now()
-      WHERE id = ${id} AND EXISTS (SELECT 1 FROM history)
+      WHERE id = ${id}
+        AND user_id = ${user.id}
+        AND EXISTS (SELECT 1 FROM history)
       RETURNING *
     `;
 
-    if (!rows[0]) return NextResponse.json({ ok: false, error: "수정할 계획이 없습니다." }, { status: 404 });
+    if (!rows[0]) {
+      return NextResponse.json(
+        { ok: false, error: "수정할 계획이 없습니다." },
+        { status: 404 }
+      );
+    }
+
     return NextResponse.json({ ok: true, plan: rows[0] });
-  } catch (error) {
-    return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "계획 수정에 실패했습니다." }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "계획 수정에 실패했습니다." },
+      { status: 500 }
+    );
   }
 }
 
-
 export async function DELETE(_: Request, context: RouteContext) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { ok: false, error: "로그인이 필요합니다." },
+        { status: 401 }
+      );
+    }
+
     const { id } = await context.params;
     const sql = getSql();
+
     const rows = await sql`
-      WITH task_ids AS MATERIALIZED (
+      WITH owned_plan AS MATERIALIZED (
+        SELECT p.id, p.title
+        FROM plans p
+        WHERE p.id = ${id}
+          AND p.user_id = ${user.id}
+      ), task_ids AS MATERIALIZED (
         SELECT t.id::text AS id
         FROM tasks t
-        WHERE t.plan_id = ${id}
+        JOIN owned_plan p ON p.id = t.plan_id
       ), deleted_keys AS (
         DELETE FROM idempotency_keys k
         USING task_ids t
@@ -98,11 +179,15 @@ export async function DELETE(_: Request, context: RouteContext) {
         RETURNING k.key
       ), deleted_reflections AS (
         DELETE FROM reflections r
-        WHERE r.plan_id = ${id} OR r.carried_to_plan_id = ${id}
+        USING owned_plan p
+        WHERE r.plan_id = p.id
+           OR r.carried_to_plan_id = p.id
         RETURNING r.id
       ), deleted_plan AS (
         DELETE FROM plans p
-        WHERE p.id = ${id}
+        USING owned_plan o
+        WHERE p.id = o.id
+          AND p.user_id = ${user.id}
         RETURNING p.id, p.title
       )
       SELECT
@@ -114,11 +199,17 @@ export async function DELETE(_: Request, context: RouteContext) {
     `;
 
     if (!rows[0]) {
-      return NextResponse.json({ ok: false, error: "삭제할 계획이 없습니다." }, { status: 404 });
+      return NextResponse.json(
+        { ok: false, error: "삭제할 계획이 없습니다." },
+        { status: 404 }
+      );
     }
 
     return NextResponse.json({ ok: true, deleted: rows[0] });
-  } catch (error) {
-    return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "계획 삭제에 실패했습니다." }, { status: 500 });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "계획 삭제에 실패했습니다." },
+      { status: 500 }
+    );
   }
 }

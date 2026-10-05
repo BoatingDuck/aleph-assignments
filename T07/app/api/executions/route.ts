@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { getCurrentUser } from "@/lib/auth";
 import { getSql } from "@/lib/db";
 
 export const runtime = "nodejs";
@@ -6,58 +7,186 @@ export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { ok: false, error: "로그인이 필요합니다." },
+        { status: 401 }
+      );
+    }
+
     const { searchParams } = new URL(request.url);
     const planId = searchParams.get("planId");
     const taskId = searchParams.get("taskId");
     const sql = getSql();
 
     if (taskId) {
+      const ownedTask = await sql`
+        SELECT t.id
+        FROM tasks t
+        JOIN plans p ON p.id = t.plan_id
+        WHERE t.id = ${taskId}
+          AND p.user_id = ${user.id}
+          AND t.deleted_at IS NULL
+        LIMIT 1
+      `;
+
+      if (!ownedTask[0]) {
+        return NextResponse.json(
+          { ok: false, error: "할 일을 찾지 못했습니다." },
+          { status: 404 }
+        );
+      }
+
       const rows = await sql`
         SELECT e.*, t.title AS task_title
         FROM execution_logs e
         JOIN tasks t ON t.id = e.task_id
+        JOIN plans p ON p.id = t.plan_id
         WHERE e.task_id = ${taskId}
+          AND p.user_id = ${user.id}
+          AND t.deleted_at IS NULL
         ORDER BY e.started_at DESC, e.id DESC
       `;
-      return NextResponse.json({ ok: true, executions: rows });
+
+      return NextResponse.json({
+        ok: true,
+        executions: rows,
+      });
     }
 
-    if (!planId) return NextResponse.json({ ok: false, error: "planId 또는 taskId가 필요합니다." }, { status: 400 });
+    if (!planId) {
+      return NextResponse.json(
+        { ok: false, error: "planId 또는 taskId가 필요합니다." },
+        { status: 400 }
+      );
+    }
+
+    const ownedPlan = await sql`
+      SELECT id
+      FROM plans
+      WHERE id = ${planId}
+        AND user_id = ${user.id}
+      LIMIT 1
+    `;
+
+    if (!ownedPlan[0]) {
+      return NextResponse.json(
+        { ok: false, error: "계획을 찾지 못했습니다." },
+        { status: 404 }
+      );
+    }
+
     const rows = await sql`
       SELECT e.*, t.title AS task_title
       FROM execution_logs e
       JOIN tasks t ON t.id = e.task_id
-      WHERE t.plan_id = ${planId} AND t.deleted_at IS NULL
+      JOIN plans p ON p.id = t.plan_id
+      WHERE t.plan_id = ${planId}
+        AND p.user_id = ${user.id}
+        AND t.deleted_at IS NULL
       ORDER BY e.started_at DESC, e.id DESC
     `;
-    return NextResponse.json({ ok: true, executions: rows });
-  } catch (error) {
-    return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "실행 기록을 불러오지 못했습니다." }, { status: 500 });
+
+    return NextResponse.json({
+      ok: true,
+      executions: rows,
+    });
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "실행 기록을 불러오지 못했습니다." },
+      { status: 500 }
+    );
   }
 }
 
 export async function POST(request: Request) {
   try {
+    const user = await getCurrentUser();
+    if (!user) {
+      return NextResponse.json(
+        { ok: false, error: "로그인이 필요합니다." },
+        { status: 401 }
+      );
+    }
+
     const body = await request.json();
     const taskId = String(body.taskId ?? "");
     const startedAt = new Date(String(body.startedAt ?? ""));
     const endedAt = new Date(String(body.endedAt ?? ""));
-    const blockerReason = String(body.blockerReason ?? "").trim() || null;
+    const blockerReason =
+      String(body.blockerReason ?? "").trim() || null;
 
-    if (!taskId || Number.isNaN(startedAt.getTime()) || Number.isNaN(endedAt.getTime())) {
-      return NextResponse.json({ ok: false, error: "할 일·시작 시각·끝난 시각을 확인하세요." }, { status: 400 });
+    if (
+      !taskId ||
+      Number.isNaN(startedAt.getTime()) ||
+      Number.isNaN(endedAt.getTime())
+    ) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "할 일·시작 시각·끝난 시각을 확인하세요.",
+        },
+        { status: 400 }
+      );
     }
-    if (endedAt < startedAt) return NextResponse.json({ ok: false, error: "끝난 시각은 시작 시각보다 빠를 수 없습니다." }, { status: 400 });
 
-    const actualMinutes = Math.max(0, Math.round((endedAt.getTime() - startedAt.getTime()) / 60000));
+    if (endedAt < startedAt) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: "끝난 시각은 시작 시각보다 빠를 수 없습니다.",
+        },
+        { status: 400 }
+      );
+    }
+
+    const actualMinutes = Math.max(
+      0,
+      Math.round(
+        (endedAt.getTime() - startedAt.getTime()) / 60000
+      )
+    );
+
     const sql = getSql();
+
     const rows = await sql`
-      INSERT INTO execution_logs (task_id, started_at, ended_at, actual_minutes, blocker_reason)
-      VALUES (${taskId}, ${startedAt.toISOString()}, ${endedAt.toISOString()}, ${actualMinutes}, ${blockerReason})
+      INSERT INTO execution_logs (
+        task_id,
+        started_at,
+        ended_at,
+        actual_minutes,
+        blocker_reason
+      )
+      SELECT
+        t.id,
+        ${startedAt.toISOString()},
+        ${endedAt.toISOString()},
+        ${actualMinutes},
+        ${blockerReason}
+      FROM tasks t
+      JOIN plans p ON p.id = t.plan_id
+      WHERE t.id = ${taskId}
+        AND p.user_id = ${user.id}
+        AND t.deleted_at IS NULL
       RETURNING *
     `;
-    return NextResponse.json({ ok: true, execution: rows[0] }, { status: 201 });
-  } catch (error) {
-    return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "실행 기록을 저장하지 못했습니다." }, { status: 500 });
+
+    if (!rows[0]) {
+      return NextResponse.json(
+        { ok: false, error: "할 일을 찾지 못했습니다." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(
+      { ok: true, execution: rows[0] },
+      { status: 201 }
+    );
+  } catch {
+    return NextResponse.json(
+      { ok: false, error: "실행 기록을 저장하지 못했습니다." },
+      { status: 500 }
+    );
   }
 }
