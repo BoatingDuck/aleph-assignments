@@ -1,5 +1,15 @@
-import PlannerApp from "@/components/PlannerApp";
+import AuthScreen from "@/components/AuthScreen";
+import AuthenticatedApp from "@/components/AuthenticatedApp";
+import { getCurrentUser } from "@/lib/auth";
 
-export default function Home() {
-  return <PlannerApp />;
+export const dynamic = "force-dynamic";
+
+export default async function Home() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    return <AuthScreen />;
+  }
+
+  return <AuthenticatedApp loginId={user.loginId} />;
 }
