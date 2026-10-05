@@ -1,0 +1,47 @@
+T07 인증 2단계 적용
+
+[추가/교체 파일]
+- lib/password.ts                 새 파일
+- lib/auth.ts                     새 파일
+- app/api/auth/signup/route.ts    새 파일
+- app/api/auth/login/route.ts     새 파일
+- app/api/auth/logout/route.ts    새 파일
+- app/api/auth/me/route.ts        새 파일
+- components/AuthScreen.tsx       새 파일
+- components/AuthenticatedApp.tsx 새 파일
+- app/page.tsx                    교체
+
+[사전 확인]
+1) package.json 이름이 t07-plan-do-see-diary인지 확인
+2) bcryptjs 설치 여부:
+   npm.cmd install bcryptjs
+3) .env.local에 T07 Neon DATABASE_URL이 있는지 확인
+
+[실행]
+npm.cmd run dev
+
+브라우저:
+http://localhost:3000
+
+[이번 단계에서 확인할 것]
+1) 첫 화면이 로그인 화면이다.
+2) '가입' 탭에서 계정을 만들 수 있다.
+3) 같은 아이디로 다시 가입하면 '이미 사용 중인 아이디입니다.'가 나온다.
+4) 가입한 계정으로 로그인하면 기존 PlannerApp 화면이 열린다.
+5) 오른쪽 위 로그아웃 버튼을 누르면 다시 로그인 화면이 나온다.
+6) 로그인 후 /api/auth/me 는 200, 로그아웃 후 /api/auth/me 는 401이다.
+7) 없는 아이디 로그인과 틀린 비밀번호 로그인은 둘 다
+   '아이디 또는 비밀번호가 올바르지 않습니다.'로 동일하다.
+
+[중요]
+- 이번 단계만으로 T07 보안 조건이 끝난 것이 아니다.
+- 기존 /api/plans, /api/tasks 등 T06 자료 API는 아직 사용자 소유권 검사를 붙이지 않았다.
+- 따라서 아직 Vercel 최종 배포/제출 상태로 간주하지 않는다.
+- 다음 단계에서 기존 모든 자료 API에 로그인 검사 + user_id 소유권 검사를 붙인다.
+
+[PlannerApp에서 수동으로 한 줄 수정]
+components/PlannerApp.tsx의 기존 문구:
+'지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다. 남이 봐도 괜찮은 내용만 넣으세요'
+
+를 아래처럼 변경:
+'로그인한 계정의 자료만 표시됩니다. 로그아웃하면 기록 화면에 접근할 수 없습니다.'
