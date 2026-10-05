@@ -1,0 +1,40 @@
+{
+  "migration": "T06 Neon -> T07 Neon",
+  "completedAt": "2026-10-05T07:19:00.405Z",
+  "success": true,
+  "counts": {
+    "plans": {
+      "source": 2,
+      "matched": 2
+    },
+    "planVersions": {
+      "source": 5,
+      "matched": 5
+    },
+    "tasks": {
+      "source": 13,
+      "matched": 13
+    },
+    "idempotencyKeys": {
+      "source": 12,
+      "matched": 12
+    },
+    "completions": {
+      "source": 12,
+      "matched": 12
+    },
+    "executions": {
+      "source": 3,
+      "matched": 3
+    },
+    "reflections": {
+      "source": 1,
+      "matched": 1
+    },
+    "securityChecks": {
+      "source": 1,
+      "matched": 1
+    }
+  },
+  "note": "비밀번호·세션·DB 연결 문자열은 이 보고서에 기록하지 않는다."
+}
