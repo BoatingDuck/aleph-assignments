@@ -1,46 +1,41 @@
-T07 3단계 — 기존 T06 자료 API를 로그인 사용자 소유권 기준으로 보호
+T07 5단계 — 비밀번호 변경 + 기존 세션 전체 폐기
 
-[교체 파일]
-app/api/plans/route.ts
-app/api/plans/[id]/route.ts
-app/api/tasks/route.ts
-app/api/tasks/[id]/route.ts
-app/api/tasks/[id]/complete/route.ts
-app/api/executions/route.ts
-app/api/reflection/route.ts
-app/api/reflection/carry/route.ts
-app/api/security-check/route.ts
-app/api/export/route.ts
+[추가/교체]
+- app/api/auth/change-password/route.ts  새 파일
+- components/ChangePasswordDialog.tsx    새 파일
+- components/AuthenticatedApp.tsx        교체
 
-[이 단계가 하는 일]
-- 모든 기존 자료 API에서 먼저 현재 세션 사용자를 확인한다.
-- 로그인하지 않으면 401을 반환한다.
-- 계획 목록은 plans.user_id = 현재 사용자만 반환한다.
-- 계획 상세/수정/삭제는 현재 사용자 소유 계획만 허용한다.
-- 할 일/실행 기록/돌아보기는 plan → user 소유권까지 JOIN해서 검사한다.
-- 클라이언트가 URL/헤더/본문에 다른 user id를 넣어도 소유자 판단에는 사용하지 않는다.
-- 다른 사용자 자료 ID를 직접 넣은 읽기/수정/삭제 요청은 404로 처리해 존재 자체를 숨긴다.
-- export는 현재 사용자 자료만 포함하며 password_hash/sessions는 절대 내보내지 않는다.
+[동작]
+1. 로그인한 사용자가 현재 비밀번호 + 새 비밀번호를 제출한다.
+2. 서버가 현재 비밀번호를 bcrypt로 검증한다.
+3. 새 비밀번호를 bcrypt로 다시 해시하여 users.password_hash를 갱신한다.
+4. 해당 사용자의 sessions 행을 전부 삭제한다.
+5. 현재 브라우저 HttpOnly 세션 쿠키도 만료한다.
+6. 앱은 로그인 화면으로 돌아간다.
 
-[중요]
-- 지금 새 T07 Neon DB는 T06 기존 데이터 복사가 아직 안 됐다면 기존 T06 자료가 보이지 않는 것이 정상이다.
-- T07-C100 때문에 나중에 최종 T06 자료를 T07 DB로 복사한 뒤 네 계정 user_id에 연결해야 한다.
-- 이 파일 적용 후부터 새로 만드는 계획에는 user_id가 자동으로 현재 로그인 계정으로 저장된다.
+[C114 확인]
+A. 비밀번호 변경 전
+   - /api/auth/me 요청이 200인지 확인
+   - DevTools > Application > Cookies > http://localhost:3000 에서
+     t07_session의 기존 Value를 개인 메모에만 임시 보관
+     (제출/대화/Git에 절대 적지 않음)
 
-[적용 뒤 기본 기능 확인]
-1) 로그인 후 새 계획 1개 생성
-2) 그 계획 안에 할 일 1개 생성
-3) 새로고침 후 그대로 보이는지 확인
-4) 로그아웃
-5) 브라우저 주소창에 아래 입력:
-   http://localhost:3000/api/plans
-   → {"ok":false,"error":"로그인이 필요합니다."} / HTTP 401이어야 함
-6) 다시 로그인
-7) 계획/할 일 생성·수정·완료·되돌리기·삭제, 실행 기록, 돌아보기, 내보내기가 기존처럼 동작하는지 확인
+B. 비밀번호 변경
+   - 현재 비밀번호 입력
+   - 새 비밀번호 입력
+   - 성공 뒤 자동으로 로그인 화면으로 돌아가는지 확인
+   - 이전 비밀번호 로그인 실패 확인
+   - 새 비밀번호 로그인 성공 확인
 
-[다음 단계]
-- 계정 A/B 양방향 권한 공격 테스트용 증거 만들기
-- T06 최종 데이터 T07 계정으로 이전
-- 비밀번호 변경 시 기존 세션 전부 폐기
-- 5일 기록 UI/API
-- 계정 삭제
+C. "이전 세션값 자체" 무효화 증거
+   - 새 비밀번호로 다시 로그인한 뒤 DevTools > Application > Cookies에서
+     현재 t07_session 값을 잠깐 다른 곳에 개인 메모
+   - t07_session Value를 비밀번호 변경 전에 보관했던 "옛 세션값"으로 바꾼다.
+   - 주소창에서 http://localhost:3000/api/auth/me 를 연다.
+   - HTTP 401 / {"ok":false,"error":"로그인이 필요합니다."} 가 나와야 통과.
+   - 테스트가 끝나면 정상 로그인으로 새 세션을 다시 발급받는다.
+
+[주의]
+- 세션값은 스크린샷/제출문에서 반드시 가린다.
+- 실제 비밀번호도 스크린샷/제출문/Git에 적지 않는다.
+- 비밀번호 입력 필드는 type=password이므로 화면에 원문을 표시하지 않는다.

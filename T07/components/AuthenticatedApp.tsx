@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import PlannerApp from "@/components/PlannerApp";
+import ChangePasswordDialog from "@/components/ChangePasswordDialog";
 
 export default function AuthenticatedApp({ loginId }: { loginId: string }) {
   const [loggingOut, setLoggingOut] = useState(false);
+  const [changingPassword, setChangingPassword] = useState(false);
 
   async function logout() {
     if (loggingOut) return;
@@ -40,7 +42,7 @@ export default function AuthenticatedApp({ loginId }: { loginId: string }) {
           zIndex: 1000,
           display: "flex",
           alignItems: "center",
-          gap: 9,
+          gap: 8,
           padding: "8px 9px 8px 12px",
           borderRadius: 999,
           background: "rgba(255,253,249,.94)",
@@ -54,6 +56,24 @@ export default function AuthenticatedApp({ loginId }: { loginId: string }) {
         <span>
           <b style={{ color: "#654529" }}>{loginId}</b> 로그인 중
         </span>
+
+        <button
+          type="button"
+          onClick={() => setChangingPassword(true)}
+          disabled={loggingOut}
+          style={{
+            border: 0,
+            borderRadius: 999,
+            padding: "7px 10px",
+            cursor: loggingOut ? "default" : "pointer",
+            background: "#f3eadf",
+            color: "#704b2f",
+            fontWeight: 800,
+          }}
+        >
+          비밀번호 변경
+        </button>
+
         <button
           type="button"
           onClick={logout}
@@ -71,6 +91,12 @@ export default function AuthenticatedApp({ loginId }: { loginId: string }) {
           {loggingOut ? "로그아웃 중…" : "로그아웃"}
         </button>
       </div>
+
+      {changingPassword && (
+        <ChangePasswordDialog
+          onClose={() => setChangingPassword(false)}
+        />
+      )}
 
       <PlannerApp />
     </>
