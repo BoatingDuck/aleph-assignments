@@ -170,6 +170,10 @@ export default function PlannerApp() {
   const [newPlanRule, setNewPlanRule] = useState("");
   const [ruleChangeReason, setRuleChangeReason] = useState("");
   const [savingRuleChange, setSavingRuleChange] = useState(false);
+  const [todayRecordDate, setTodayRecordDate] = useState("");
+  const [todayActualMinutes, setTodayActualMinutes] = useState(0);
+  const [todayRecordConfirmed, setTodayRecordConfirmed] = useState(false);
+  const [confirmingTodayRecord, setConfirmingTodayRecord] = useState(false);
   const [notice, setNotice] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(true);
@@ -262,15 +266,41 @@ export default function PlannerApp() {
       ruleChange: RuleChange | null;
       dayCount: number;
       dayDates: string[];
+      todayDate: string;
+      todayActualMinutes: number;
+      todayRecordConfirmed: boolean;
     }>("/api/tracking-config");
     setTrackingConfig(data.config);
     setRuleChange(data.ruleChange);
     setTrackingDayCount(data.dayCount);
     setTrackingDayDates(data.dayDates);
+    setTodayRecordDate(data.todayDate);
+    setTodayActualMinutes(data.todayActualMinutes);
+    setTodayRecordConfirmed(data.todayRecordConfirmed);
     if (data.config && !data.ruleChange) {
       setNewPlanRule(data.config.plan_rule);
     }
   }, []);
+  async function confirmTodayRecord() {
+    if (todayRecordConfirmed) return;
+    setConfirmingTodayRecord(true);
+    try {
+      const data = await api<{ ok: true; recordDate: string; metricValue: number; alreadyConfirmed: boolean }>(
+        "/api/tracking-config",
+        { method: "POST", body: JSON.stringify({}) }
+      );
+      await loadTrackingConfig();
+      flash(
+        data.alreadyConfirmed
+          ? `${data.recordDate} 관찰 기록은 이미 확정되어 있습니다.`
+          : `${data.recordDate} 관찰 기록 ${data.metricValue}분을 확정했습니다.`
+      );
+    } catch (e) {
+      showError(e);
+    } finally {
+      setConfirmingTodayRecord(false);
+    }
+  }
   async function submitPlanRuleChange(event: FormEvent) {
     event.preventDefault();
     if (!trackingConfig || ruleChange) return;
@@ -828,6 +858,37 @@ export default function PlannerApp() {
                     <article><span>측정 지표</span><strong>{trackingConfig.metric_name}</strong></article>
                     <article><span>측정 단위</span><strong>{trackingConfig.metric_unit}</strong></article>
                     <article><span>주 시작 요일</span><strong>{trackingConfig.week_starts_on === "monday" ? "월요일" : "일요일"}</strong></article>
+                  </div>
+                  <div className="panel today-observation-panel">
+                    <div className="panel-title">
+                      <h3>오늘 관찰 기록</h3>
+                      <span>Asia/Seoul 기준 오늘의 실행 기록을 합산해 일별 관찰값으로 확정합니다.</span>
+                    </div>
+                    <div className="today-observation-summary">
+                      <div>
+                        <span>관찰 날짜</span>
+                        <strong>{todayRecordDate || "-"}</strong>
+                      </div>
+                      <div>
+                        <span>오늘 실행 기록 합계</span>
+                        <strong>{minutesLabel(todayActualMinutes)}</strong>
+                      </div>
+                    </div>
+                    <div className="form-actions form-actions-bottom">
+                      <button
+                        className="primary-button"
+                        type="button"
+                        onClick={confirmTodayRecord}
+                        disabled={todayRecordConfirmed || confirmingTodayRecord}
+                      >
+                        {todayRecordConfirmed ? "오늘 기록 확정 완료" : confirmingTodayRecord ? "확정 중…" : "오늘 기록 확정"}
+                      </button>
+                    </div>
+                    <p className="tracking-help">
+                      {todayRecordConfirmed
+                        ? "오늘 날짜의 관찰값이 저장되었습니다. 같은 날짜로는 중복 기록을 만들지 않습니다."
+                        : "버튼을 누르면 현재까지 저장된 오늘 실행 기록의 actual_minutes 합계를 관찰값으로 저장합니다."}
+                    </p>
                   </div>
                   <div className="panel tracking-rules-panel">
                     <div className="panel-title">
