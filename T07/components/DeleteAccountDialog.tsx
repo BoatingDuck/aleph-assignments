@@ -40,7 +40,7 @@ export default function DeleteAccountDialog({
         throw new Error(data.error || "계정 삭제에 실패했습니다.");
       }
 
-      window.location.href = "/";
+      window.location.reload();
     } catch (value) {
       setError(
         value instanceof Error

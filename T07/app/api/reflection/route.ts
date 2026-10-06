@@ -82,7 +82,7 @@ export async function GET(request: Request) {
           AND t.deleted_at IS NULL
         ORDER BY e.started_at ASC, e.id ASC
       `),
-    ] as Array<Record<string, any>>;
+    ] as Array<Record<string, unknown>>;
 
     const normalizedTasks: NormalizedReflectionTask[] =
       tasks.map((task) => ({

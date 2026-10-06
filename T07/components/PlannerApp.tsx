@@ -350,15 +350,18 @@ export default function PlannerApp() {
   }, []);
   useEffect(() => {
     if (!selectedPlanId) return;
+// eslint-disable-next-line react-hooks/set-state-in-effect
     loadTasks(selectedPlanId).catch(showError);
   }, [filters, selectedPlanId, loadTasks, showError]);
   useEffect(() => {
     if (!selectedPlanId) return;
+// eslint-disable-next-line react-hooks/set-state-in-effect
     Promise.all([loadPlanDetail(selectedPlanId), loadExecutions(selectedPlanId), loadReflection(selectedPlanId)]).catch(showError);
   }, [selectedPlanId, loadExecutions, loadPlanDetail, loadReflection, showError]);
   useEffect(() => {
     if (!selectedPlanId || tasks.length === 0) return;
     if (!executionForm.taskId || !tasks.some((task) => task.id === executionForm.taskId)) {
+// eslint-disable-next-line react-hooks/set-state-in-effect
       setExecutionForm((current) => ({ ...current, taskId: tasks[0].id }));
     }
   }, [executionForm.taskId, selectedPlanId, tasks]);

@@ -12,6 +12,18 @@ import {
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
+type TaskRow = {
+  id: string;
+  title: string;
+  tags: string[] | null;
+  status: string;
+  priority: Priority;
+  created_at: string | Date;
+  estimated_minutes: number | string | null;
+  due_date: unknown;
+  [key: string]: unknown;
+};
+
 function text(value: unknown) {
   return String(value ?? "").toLowerCase();
 }
@@ -62,7 +74,7 @@ export async function GET(request: Request) {
           AND p.user_id = ${user.id}
           AND t.deleted_at IS NULL
       `),
-    ] as Array<Record<string, any>>;
+    ] as TaskRow[];
 
     const q = (searchParams.get("q") ?? "").trim().toLowerCase();
     const status = searchParams.get("status") ?? "all";
@@ -97,8 +109,8 @@ export async function GET(request: Request) {
     }
 
     const byCreated = (
-      a: Record<string, any>,
-      b: Record<string, any>
+      a: TaskRow,
+      b: TaskRow
     ) => {
       const diff =
         new Date(a.created_at).getTime() -
