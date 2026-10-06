@@ -652,7 +652,7 @@ export default function PlannerApp() {
               <p className="eyebrow hero-eyebrow">PLAN · DO · SEE</p>
               <h1>Plan-Do-See Diary</h1>
               <p className="hero-description">계획 · 실행 · 돌아보기를 한 흐름으로 기록합니다.</p>
-              <p className="public-note">지금은 로그인이 없어 링크를 아는 사람은 누구나 볼 수 있습니다. 남이 봐도 괜찮은 내용만 넣으세요</p>
+              <p className="public-note">로그인한 계정의 기록만 볼 수 있습니다.</p>
             </div>
             <div className="hero-card">
               <span className="hero-card-label">현재 흐름</span>
