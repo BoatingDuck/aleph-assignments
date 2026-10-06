@@ -1,3 +1,4 @@
+import { dateValueToSeoulDateString } from "@/lib/pds";
 import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getSql } from "@/lib/db";
@@ -188,8 +189,8 @@ export async function PATCH(request: Request) {
     if (newPlanRule === config.plan_rule) {
       return NextResponse.json({ ok: false, error: "현재 계획 규칙과 다른 내용으로 입력하세요." }, { status: 400 });
     }
-    const day1Date = String(dayRows[0].record_date);
-    const day2Date = String(dayRows[1].record_date);
+    const day1Date = dateValueToSeoulDateString(dayRows[0].record_date);
+    const day2Date = dateValueToSeoulDateString(dayRows[1].record_date);
     await sql`
       INSERT INTO t07_rule_changes (
         user_id, config_id, old_plan_rule, new_plan_rule,
