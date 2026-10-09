@@ -69,6 +69,8 @@ export async function GET() {
       ruleChange: changeRows[0] ?? null,
       dayCount: dayDates.length,
       dayDates,
+      totalMinutes: Number(summaryRows[0]?.total_minutes ?? 0),
+      averageMinutes: Number(summaryRows[0]?.average_minutes ?? 0),
       todayDate,
       todayActualMinutes: Number(totalRows[0]?.total_minutes ?? 0),
       todayRecordConfirmed: confirmedRows.length > 0,
