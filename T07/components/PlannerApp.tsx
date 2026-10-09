@@ -167,6 +167,8 @@ export default function PlannerApp() {
   const [ruleChange, setRuleChange] = useState<RuleChange | null>(null);
   const [trackingDayCount, setTrackingDayCount] = useState(0);
   const [trackingDayDates, setTrackingDayDates] = useState<string[]>([]);
+  const [trackingTotalMinutes, setTrackingTotalMinutes] = useState(0);
+  const [trackingAverageMinutes, setTrackingAverageMinutes] = useState(0);
   const [newPlanRule, setNewPlanRule] = useState("");
   const [ruleChangeReason, setRuleChangeReason] = useState("");
   const [savingRuleChange, setSavingRuleChange] = useState(false);
@@ -266,6 +268,8 @@ export default function PlannerApp() {
       ruleChange: RuleChange | null;
       dayCount: number;
       dayDates: string[];
+      totalMinutes: number;
+      averageMinutes: number;
       todayDate: string;
       todayActualMinutes: number;
       todayRecordConfirmed: boolean;
@@ -274,6 +278,8 @@ export default function PlannerApp() {
     setRuleChange(data.ruleChange);
     setTrackingDayCount(data.dayCount);
     setTrackingDayDates(data.dayDates);
+    setTrackingTotalMinutes(data.totalMinutes);
+    setTrackingAverageMinutes(data.averageMinutes);
     setTodayRecordDate(data.todayDate);
     setTodayActualMinutes(data.todayActualMinutes);
     setTodayRecordConfirmed(data.todayRecordConfirmed);
@@ -893,6 +899,26 @@ export default function PlannerApp() {
                         : "버튼을 누르면 현재까지 저장된 오늘 실행 기록의 actual_minutes 합계를 관찰값으로 저장합니다."}
                     </p>
                   </div>
+                  {trackingDayCount === 5 && (
+                    <div className="panel">
+                      <div className="panel-title">
+                        <h3>5일 관찰 결과</h3>
+                        <span>확정한 5일 기록을 같은 계산 규칙으로 집계합니다.</span>
+                      </div>
+                  
+                      <div className="tracking-summary-grid">
+                        <article>
+                          <span>5일 합계</span>
+                          <strong>{trackingTotalMinutes}분</strong>
+                        </article>
+                  
+                        <article>
+                          <span>5일 평균</span>
+                          <strong>{trackingAverageMinutes.toFixed(1)}분</strong>
+                        </article>
+                      </div>
+                    </div>
+                  )}
                   <div className="panel tracking-rules-panel">
                     <div className="panel-title">
                       <h3>고정 계산 규칙</h3>
