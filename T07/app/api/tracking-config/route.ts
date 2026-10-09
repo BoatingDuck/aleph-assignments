@@ -40,8 +40,13 @@ export async function GET() {
       SELECT
         COALESCE(SUM(metric_value), 0)::int AS total_minutes,
         COALESCE(ROUND(AVG(metric_value), 1), 0) AS average_minutes
-      FROM t07_daily_records
-      WHERE user_id = ${user.id}
+      FROM (
+        SELECT metric_value
+        FROM t07_daily_records
+        WHERE user_id = ${user.id}
+        ORDER BY record_date DESC
+        LIMIT 5
+      ) AS recent_five_days
     `;
     const todayRows = await sql`
       SELECT (now() AT TIME ZONE 'Asia/Seoul')::date::text AS today_date
