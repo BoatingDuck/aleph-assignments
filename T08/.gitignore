@@ -1,0 +1,9 @@
+node_modules/
+.env
+.env.*
+!.env.example
+.vercel/
+.DS_Store
+npm-debug.log*
+# public/passkey-client.js is rebuilt from src/passkey-client.js
+public/passkey-client.js

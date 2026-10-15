@@ -1,0 +1,27 @@
+{
+  "name": "aleph-t08-passkey-room",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "engines": { "node": "22.x" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/dev.mjs",
+    "sync:t01": "node scripts/sync-t01.mjs",
+    "db:init": "node scripts/init-db.mjs",
+    "invite:owner": "node scripts/create-invite.mjs owner",
+    "invite:reviewer": "node scripts/create-invite.mjs reviewer",
+    "public-keys": "node scripts/show-public-keys.mjs",
+    "check:public": "node scripts/check-public.mjs",
+    "test": "node --test tests/*.test.mjs"
+  },
+  "dependencies": {
+    "@neondatabase/serverless": "^1.0.0",
+    "@simplewebauthn/server": "13.2.2",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@simplewebauthn/browser": "13.2.2",
+    "esbuild": "^0.25.12"
+  }
+}

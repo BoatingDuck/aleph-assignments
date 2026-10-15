@@ -1,0 +1,46 @@
+<section class="private-section" id="private-room" aria-labelledby="private-title">
+  <div class="wrap">
+    <div class="private-heading">
+      <div><p class="eyebrow">T08 · PASSKEY ONLY</p><h2 id="private-title">나만 볼 수 있는 자리</h2>
+        <p>공개 소개와 별개로, 이 영역만 패스키로 보호합니다. 여기에 등장하는 기록은 전부 <strong>과제용 가상 데이터</strong>입니다.</p></div>
+      <span class="private-lock">🔒 비공개 영역</span>
+    </div>
+    <div class="private-panel" aria-live="polite">
+      <p id="t08-message" class="private-message" role="status">로그인 상태를 확인하고 있습니다.</p>
+      <div id="t08-guest" hidden>
+        <p class="private-kicker">PASSKEY SIGN IN</p><h3>비밀번호 대신 패스키로 들어가기</h3>
+        <p>등록한 기기의 화면 잠금 또는 보안 키로 인증합니다. 공개 소개는 인증 없이 읽을 수 있습니다.</p>
+        <div class="private-form">
+          <label for="t08-account">실습 계정</label>
+          <select id="t08-account"><option value="owner">내 실습 계정</option><option value="reviewer">검증용 두 번째 계정</option></select>
+          <button type="button" class="button solid" id="t08-login">패스키로 로그인 ↗</button>
+        </div>
+        <p class="private-hint">등록된 패스키가 없는 계정은 관리자가 발급한 일회용 등록 링크를 이용해야 합니다.</p>
+      </div>
+      <div id="t08-invite" hidden>
+        <p class="private-kicker">FIRST REGISTRATION</p><h3>일회용 초대 링크로 첫 패스키 등록</h3>
+        <p>초대 링크는 최초 등록 1회에만 사용하며, 로그인 비밀번호로 사용하지 않습니다.</p>
+        <div class="private-form">
+          <label for="t08-first-label">패스키 이름</label>
+          <input id="t08-first-label" maxlength="40" value="첫 번째 패스키" autocomplete="off">
+          <button type="button" class="button solid" id="t08-first-register">첫 패스키 등록</button>
+        </div>
+      </div>
+      <div id="t08-member" hidden>
+        <div class="private-member-top"><div><p class="private-kicker">AUTHENTICATED</p><h3 id="t08-welcome"></h3></div>
+          <button type="button" class="button outline" id="t08-logout">로그아웃</button></div>
+        <h4>비공개 기록 · 내 계정에서만 서버가 전송</h4>
+        <div id="t08-notes" class="private-notes"></div>
+        <div class="private-keys-head"><h4>등록한 패스키</h4><p>이름과 등록 일자를 확인하고, 두 번째 패스키를 추가할 수 있습니다.</p></div>
+        <ul id="t08-keys" class="private-key-list"></ul>
+        <div class="private-form private-register-more">
+          <label for="t08-more-label">새 패스키 이름</label>
+          <input id="t08-more-label" maxlength="40" value="예비 패스키" autocomplete="off">
+          <button type="button" class="button solid" id="t08-more-register">패스키 추가 등록</button>
+        </div>
+        <p class="private-hint">마지막 하나만 남으면 삭제가 거절됩니다. 저장한 모든 패스키를 잃어버리면 관리자의 별도 신원 확인 없이 계정 복구가 불가능합니다.</p>
+      </div>
+    </div>
+    <p class="private-footnote">안내: 이 영역의 실제 데이터는 공개 HTML, JavaScript, 번들에 포함되지 않으며 세션 검증을 통과한 뒤 별도 API 응답으로만 내려옵니다.</p>
+  </div>
+</section>

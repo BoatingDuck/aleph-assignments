@@ -1,0 +1,11 @@
+import express from 'express';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import handler from '../api/index.js';
+const app=express();
+app.disable('x-powered-by');
+app.use(express.json({limit:'40kb'}));
+app.all('/api',handler);
+const root=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'../public');
+app.use(express.static(root,{index:'index.html',dotfiles:'deny'}));
+app.listen(3000,()=>console.log('로컬 서버 http://localhost:3000 (RP_ID=localhost 이어야 함)'));
