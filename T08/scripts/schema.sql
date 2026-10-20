@@ -48,3 +48,15 @@ CREATE TABLE IF NOT EXISTS t08_sessions (
   revoked_at TIMESTAMPTZ
 );
 CREATE INDEX IF NOT EXISTS t08_sessions_account_idx ON t08_sessions(account_id);
+
+-- Supabase: no browser/anon/authenticated role may read WebAuthn credentials,
+-- invitations, challenges, sessions, or private notes through PostgREST.
+-- Only the server's PostgreSQL connection is used for this T08 application.
+ALTER TABLE public.t08_accounts ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.t08_notes ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.t08_passkeys ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.t08_invites ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.t08_challenges ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.t08_sessions ENABLE ROW LEVEL SECURITY;
+REVOKE ALL ON TABLE public.t08_accounts, public.t08_notes, public.t08_passkeys,
+  public.t08_invites, public.t08_challenges, public.t08_sessions FROM anon, authenticated;

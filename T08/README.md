@@ -5,7 +5,7 @@
 기존 **T01 전체 공개 소개** 아래에 T08 비공개 섹션만 추가합니다. 정적인 `public/index.html`에는 비공개 가상 메모가 들어 있지 않습니다. 비공개 자료는 서버의 `GET /api?action=notes`에서 **HttpOnly 세션 쿠키** 확인 후에만 내려갑니다. 비밀번호 로그인·비밀번호 DB 칼럼은 없습니다.
 
 * **인증**: SimpleWebAuthn 13.2.2 (WebAuthn/FIDO2), 애플리케이션 서버에 개인키를 보내지 않는 인증, 서버 측 공개키·서명 검증. 발견 가능한 자격 증명(`residentKey: required`) 및 사용자 확인을 요구
-* **DB**: Neon PostgreSQL, 사용자 2명(`owner`, `reviewer`), 서로 다른 가상 메모 3건씩
+* **DB**: Supabase PostgreSQL, 사용자 2명(`owner`, `reviewer`), 서로 다른 가상 메모 3건씩
 * **배포**: Vercel (프레임워크 Other, Root Directory = `T08`, npm, Node.js 22.x)
 * **최초 등록**: 터미널에서 발급하는 **10분·1회용 초대 URL**. 최초 등록 이외에는 사용할 수 없습니다. 별도 비밀번호는 사용하지 않습니다. 로그인 후에는 기존 패스키 인증을 거친 세션으로만 추가 등록합니다.
 * **잠금 안전장치**: 마지막 패스키 삭제 금지. 아무 패스키 없는 초기 계정은 로그인 거절 후 새 일회용 초대로 최초 등록해야 합니다.
@@ -25,24 +25,28 @@ npm.cmd test
 
 `sync:t01`은 **실제 기존 T01의 HTML/CSS/JS/파비콘을 읽어** `T08/public`에 복사하고 비공개 섹션만 덧붙입니다. ZIP에도 동일 내용의 공개 소개 페이지를 별도로 넣었지만, **최종 제출에는 이 명령을 꼭 실행해 본래 T01 화면을 100% 유지**하세요. 복사 결과 `public/index.html`, `public/style.css`, `public/script.js`, `public/assets/favicon.svg`도 `T08` 커밋에 포함해야 합니다.
 
-## Neon 데이터베이스 및 Vercel 배포
+## Supabase 데이터베이스 및 Vercel 배포
 
-1. Neon에 빈 PostgreSQL DB를 만든 후 접속 문자열을 복사합니다. **절대 Git에 올리지 마세요.** T06/T07 DB를 사용하더라도 테이블은 `t08_` 접두사를 사용합니다.
+1. Supabase에서 새 프로젝트를 만든 후 Dashboard → Connect → Transaction pooler (6543)의 PostgreSQL 접속 URI를 복사합니다. Vercel 서버리스 연결이므로 `pg`(node-postgres)의 파라미터 바인딩 및 1개 연결 풀을 사용합니다. Supabase Auth는 사용하지 않습니다. **절대 Git에 올리지 마세요.** T08 전용 프로젝트를 권장합니다. 테이블에는 `t08_` 접두사가 붙습니다.
 2. Vercel에서 새 프로젝트를 연결합니다. GitHub `BoatingDuck/aleph-assignments` 저장소, Root Directory `T08`, Framework Preset `Other`, Build Command `npm run build`, Output Directory `public`, Node.js 22.x. **접근 보호/비밀번호 보호는 끕니다.**
 3. 고정 HTTPS 배포 주소를 정하고 Vercel 프로젝트 환경변수 3개를 추가합니다.
 
 | 변수 | 예시 형식 | 주의 |
 | --- | --- | --- |
-| `DATABASE_URL` | `postgresql://USER:***@HOST/DB?sslmode=require` | Vercel 서버 전용, 클라이언트 접두사 사용 금지 |
+| `DATABASE_URL` | Supabase Connect → Transaction pooler의 PostgreSQL URI | **비밀값**, Vercel 서버 전용, 클라이언트 접두사 금지 |
 | `RP_ORIGIN` | `https://t08-example.vercel.app` | 배포된 페이지의 **정확한** Origin, 슬래시 없이 |
 | `RP_ID` | `t08-example.vercel.app` | 포트·스킴 없는 호스트명 |
 
 환경변수를 설정한 뒤 **Redeploy**하세요. Preview URL이나 도메인이 달라지면 WebAuthn 검증이 실패할 수 있으므로 하나의 고정 프로덕션 도메인에서 등록하고 시험하세요.
 
+**Supabase 보안 설정**: `npm run db:init`은 스키마를 만들고 `t08_` 6개 테이블 전체에 RLS를 적용하며 `anon`/`authenticated`의 접근 권한을 회수합니다. 이 앱은 Supabase Data API 또는 Supabase Auth를 쓰지 않습니다. WebAuthn 서버만 비공개 데이터에 접근합니다. PostgreSQL 접속 계정은 서버에서만 사용합니다.
+
+**설치 의존성 변경**: 이전 Neon 라이브러리를 제거하고 `pg`를 사용합니다. 패치 적용 후 반드시 `npm.cmd install`을 실행하여 `package-lock.json`을 다시 만들고 같이 커밋해야 합니다.
+
 4. PC PowerShell 터미널에서 실제 값으로 **해당 세션의 환경변수만 지정**합니다. 아래 URL은 예시이며 실제 비밀값을 문서/캡처에 포함하지 않습니다.
 
 ```powershell
-$env:DATABASE_URL = 'NEON에서_받은_접속_문자열'
+$env:DATABASE_URL = 'SUPABASE에서_받은_Transaction_pooler_URI'
 $env:RP_ORIGIN = 'https://실제-T08-배포-주소.vercel.app'
 $env:RP_ID = '실제-T08-배포-주소.vercel.app'
 npm.cmd run db:init
