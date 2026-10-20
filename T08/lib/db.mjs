@@ -6,12 +6,36 @@ import pg from 'pg';
 const { Pool } = pg;
 let sqlClient;
 
-export function db() {
+function connectionConfig() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL이 설정되지 않았습니다.');
+
+  // pg-connection-string replaces the explicit ssl object if sslmode (or
+  // related SSL URL options) is present. Keep TLS configuration in ONE place.
+  // TLS and hostname verification are enforced by the ssl options below.
+  const uri = new URL(process.env.DATABASE_URL);
+  for (const key of ['ssl', 'sslmode', 'sslcert', 'sslkey', 'sslrootcert']) {
+    uri.searchParams.delete(key);
+  }
+
+  const ssl = { rejectUnauthorized: true };
+  const encodedCa = process.env.SUPABASE_DB_CA_B64?.trim();
+  if (encodedCa) {
+    const ca = Buffer.from(encodedCa, 'base64').toString('utf8').trim();
+    if (!ca.includes('-----BEGIN CERTIFICATE-----') ||
+      !ca.includes('-----END CERTIFICATE-----')) {
+      throw new Error('SUPABASE_DB_CA_B64 인증서 형식이 올바르지 않습니다.');
+    }
+    // The CA is a public trust certificate, NOT a DB password or private key.
+    ssl.ca = ca;
+  }
+
+  return { connectionString: uri.toString(), ssl };
+}
+
+export function db() {
   if (!sqlClient) {
     const pool = new Pool({
-      connectionString: process.env.DATABASE_URL,
-      ssl: { rejectUnauthorized: true },
+      ...connectionConfig(),
       max: 1,
       connectionTimeoutMillis: 10_000,
       idleTimeoutMillis: 20_000,
