@@ -2312,4 +2312,296 @@ body {
     font-size: 13px;
     padding-bottom: 14px
   }
+}/* ===========================================================
+   T08 · Strength overview: connected editorial strip
+   Add this block at the very end of public/design.css.
+   This changes presentation only; HTML, links, WebAuthn, and
+   Supabase are unchanged. Keeps previous font-size adjustments.
+   =========================================================== */
+.strength-overview .overview-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid #ddd1c2;
+  border-radius: 15px;
+  background: rgba(255, 252, 247, .54);
+  box-shadow: 0 10px 28px rgba(67, 52, 38, .025);
 }
+.strength-overview .overview-list li {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-right: 1px solid #e1d6c9;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none !important;
+  transition: background-color .65s var(--t08-calm, ease);
+}
+.strength-overview .overview-list li:last-child { border-right: 0; }
+.strength-overview .overview-list li:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--rust);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .6s var(--t08-calm, ease);
+  pointer-events: none;
+}
+.strength-overview .overview-list li:hover,
+.strength-overview .overview-list li:focus-within {
+  background: rgba(238, 224, 208, .42);
+  box-shadow: none;
+  border-color: #e1d6c9;
+}
+.strength-overview .overview-list li:hover:after,
+.strength-overview .overview-list li:focus-within:after { transform: scaleX(1); }
+.strength-overview .overview-list a {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 14px;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 101px;
+  padding: 17px 17px;
+  background: transparent !important;
+}
+.strength-overview .overview-number {
+  font-family: inherit;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 730;
+  line-height: 1;
+  letter-spacing: -.06em;
+  color: var(--rust);
+  padding: 0;
+}
+.strength-overview .overview-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.strength-overview .overview-copy strong {
+  font-size: 15px;
+  line-height: 1.42;
+  font-weight: 700;
+  letter-spacing: -.045em;
+  color: var(--ink);
+}
+.strength-overview .overview-copy > span {
+  font-size: 12px;
+  line-height: 1.55;
+  margin-top: 6px;
+  color: #71695f;
+  letter-spacing: -.025em;
+}
+.strength-overview .overview-arrow {
+  font-size: 15px;
+  line-height: 1;
+  align-self: center;
+  justify-self: end;
+  color: #a65c41;
+  transform: none !important;
+}
+.strength-overview .overview-hint {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+@media (max-width: 760px) {
+  .strength-overview .overview-list { grid-template-columns: 1fr; border-radius: 13px; }
+  .strength-overview .overview-list li {
+    border-right: 0;
+    border-bottom: 1px solid #e1d6c9;
+  }
+  .strength-overview .overview-list li:last-child { border-bottom: 0; }
+  .strength-overview .overview-list a {
+    grid-template-columns: 36px minmax(0, 1fr) 16px;
+    column-gap: 12px;
+    min-height: 0;
+    padding: 15px 18px;
+  }
+  .strength-overview .overview-number { font-size: 22px; }
+  .strength-overview .overview-copy strong { font-size: 14px; }
+  .strength-overview .overview-copy > span { font-size: 12px; margin-top: 4px; }
+  .strength-overview .overview-hint { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .strength-overview .overview-list li,
+  .strength-overview .overview-list li:after { transition: none; }
+}
+
+/* ===========================================================
+   T08 · Strength overview: connected editorial strip
+   Add this block at the very end of public/design.css.
+   This changes presentation only; HTML, links, WebAuthn, and
+   Supabase are unchanged. Keeps previous font-size adjustments.
+   =========================================================== */
+.strength-overview .overview-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0;
+  overflow: hidden;
+  border: 1px solid #ddd1c2;
+  border-radius: 15px;
+  background: rgba(255, 252, 247, .54);
+  box-shadow: 0 10px 28px rgba(67, 52, 38, .025);
+}
+.strength-overview .overview-list li {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border: 0;
+  border-right: 1px solid #e1d6c9;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  transform: none !important;
+  transition: background-color .65s var(--t08-calm, ease);
+}
+.strength-overview .overview-list li:last-child { border-right: 0; }
+.strength-overview .overview-list li:after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background: var(--rust);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform .6s var(--t08-calm, ease);
+  pointer-events: none;
+}
+.strength-overview .overview-list li:hover,
+.strength-overview .overview-list li:focus-within {
+  background: rgba(238, 224, 208, .42);
+  box-shadow: none;
+  border-color: #e1d6c9;
+}
+.strength-overview .overview-list li:hover:after,
+.strength-overview .overview-list li:focus-within:after { transform: scaleX(1); }
+.strength-overview .overview-list a {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr) 14px;
+  align-items: center;
+  column-gap: 12px;
+  min-height: 101px;
+  padding: 17px 17px;
+  background: transparent !important;
+}
+.strength-overview .overview-number {
+  font-family: inherit;
+  font-size: 24px;
+  font-style: normal;
+  font-weight: 730;
+  line-height: 1;
+  letter-spacing: -.06em;
+  color: var(--rust);
+  padding: 0;
+}
+.strength-overview .overview-copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+.strength-overview .overview-copy strong {
+  font-size: 15px;
+  line-height: 1.42;
+  font-weight: 700;
+  letter-spacing: -.045em;
+  color: var(--ink);
+}
+.strength-overview .overview-copy > span {
+  font-size: 12px;
+  line-height: 1.55;
+  margin-top: 6px;
+  color: #71695f;
+  letter-spacing: -.025em;
+}
+.strength-overview .overview-arrow {
+  font-size: 15px;
+  line-height: 1;
+  align-self: center;
+  justify-self: end;
+  color: #a65c41;
+  transform: none !important;
+}
+.strength-overview .overview-hint {
+  margin-top: 12px;
+  font-size: 12px;
+  line-height: 1.6;
+}
+@media (max-width: 760px) {
+  .strength-overview .overview-list { grid-template-columns: 1fr; border-radius: 13px; }
+  .strength-overview .overview-list li {
+    border-right: 0;
+    border-bottom: 1px solid #e1d6c9;
+  }
+  .strength-overview .overview-list li:last-child { border-bottom: 0; }
+  .strength-overview .overview-list a {
+    grid-template-columns: 36px minmax(0, 1fr) 16px;
+    column-gap: 12px;
+    min-height: 0;
+    padding: 15px 18px;
+  }
+  .strength-overview .overview-number { font-size: 22px; }
+  .strength-overview .overview-copy strong { font-size: 14px; }
+  .strength-overview .overview-copy > span { font-size: 12px; margin-top: 4px; }
+  .strength-overview .overview-hint { font-size: 12px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .strength-overview .overview-list li,
+  .strength-overview .overview-list li:after { transition: none; }
+}
+
+/* T08 · Two experience records — slow hover color fade.
+   Append to the END of T08/public/design.css, once.
+   Keep layout, original copy, WebAuthn, Supabase and scroll reveal intact. */
+
+/* The project panels darken gradually instead of switching immediately. */
+.work-section .project {
+  transition: background-color 1.65s cubic-bezier(.42, 0, .23, 1);
+}
+
+/* T08's scroll-reveal animation also specifies 'transition'.
+   Preserve its opacity and transform transitions while adding background-color. */
+@media (prefers-reduced-motion: no-preference) {
+  html.t08-motion .work-section .project.t08-reveal {
+    transition:
+      background-color 1.65s cubic-bezier(.42, 0, .23, 1),
+      opacity 1.25s var(--t08-calm, ease),
+      transform 1.25s var(--t08-calm, ease);
+    transition-delay:
+      0s,
+      var(--t08-delay, 0ms),
+      var(--t08-delay, 0ms);
+  }
+}
+
+/* The cursor glow should fade at the same pace as the panel. */
+.work-section .project::before {
+  transition: opacity 1.65s cubic-bezier(.42, 0, .23, 1);
+}
+
+/* Retain the original warm hover color without moving the content. */
+.work-section .project:hover,
+.work-section .project:focus-within {
+  background-color: #e1d8ce;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .work-section .project,
+  html.t08-motion .work-section .project.t08-reveal,
+  .work-section .project::before {
+    transition: none !important;
+  }
+}
+
