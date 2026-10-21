@@ -6,7 +6,7 @@ import pg from 'pg';
 const { Pool } = pg;
 let sqlClient;
 
-function connectionConfig() {
+export function connectionConfig() {
   if (!process.env.DATABASE_URL) throw new Error('DATABASE_URL이 설정되지 않았습니다.');
 
   // pg-connection-string replaces the explicit ssl object if sslmode (or
