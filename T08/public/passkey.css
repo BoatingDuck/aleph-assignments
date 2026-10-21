@@ -46,3 +46,10 @@
 .t08-invite-qr[hidden] { display: none; }
 .t08-invite-qr img { width: 230px; height: 230px; max-width: 100%; background: #fffcf8; display: block; }
 .t08-invite-qr .private-hint { max-width: 300px; margin: 0; }
+
+/* PC -> phone passkey sign-in is additive to the existing T01 design. */
+.t08-phone-panel{margin-top:20px;border:1px solid #d9d0c1;background:#f8f5ed;padding:20px;border-radius:12px;max-width:510px}
+.t08-phone-panel[hidden]{display:none}
+.t08-phone-panel img{display:block;max-width:100%;margin:14px 0;border-radius:8px}
+.t08-phone-panel img[hidden]{display:none}
+.t08-phone-panel .button{margin:10px 8px 0 0;min-height:44px}
