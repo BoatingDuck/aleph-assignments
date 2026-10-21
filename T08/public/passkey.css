@@ -36,3 +36,13 @@
 .private-delete:hover{background:#fbeee9}
 .private-register-more{margin-top:28px}
 @media(max-width:750px){.private-section{padding-block:50px}.private-heading{display:block}.private-lock{display:inline-block;margin-top:12px}.private-panel{padding:22px}.private-notes{grid-template-columns:1fr}.private-member-top{align-items:flex-start}.private-form input,.private-form select{width:100%}}
+
+
+/* 등록 초대 링크를 PC에서 휴대폰으로 전달하기 위한 QR 영역 */
+.t08-invite-qr-actions { margin-top: 14px; }
+.t08-invite-qr-actions .button { min-height: 43px; border-radius: 9px; }
+.t08-invite-qr-actions .private-hint { margin: 9px 0 0; }
+.t08-invite-qr { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; width: fit-content; max-width: 100%; background: #fffcf8; border: 1px solid #d9d0c1; padding: 17px; margin-top: 13px; border-radius: 12px; }
+.t08-invite-qr[hidden] { display: none; }
+.t08-invite-qr img { width: 230px; height: 230px; max-width: 100%; background: #fffcf8; display: block; }
+.t08-invite-qr .private-hint { max-width: 300px; margin: 0; }

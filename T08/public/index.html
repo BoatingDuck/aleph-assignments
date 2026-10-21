@@ -53,6 +53,14 @@
           <input id="t08-first-label" maxlength="40" value="첫 번째 패스키" autocomplete="off">
           <button type="button" class="button solid" id="t08-first-register">첫 패스키 등록</button>
         </div>
+              <div class="t08-invite-qr-actions">
+          <button type="button" class="button outline" id="t08-show-invite-qr" aria-expanded="false" aria-controls="t08-invite-qr">휴대폰으로 등록 · QR 보기</button>
+          <p class="private-hint">PC에서 QR을 띄우고 휴대폰 카메라로 스캔해 첫 패스키를 등록할 수 있습니다.</p>
+        </div>
+        <div id="t08-invite-qr" class="t08-invite-qr" hidden>
+          <img id="t08-invite-qr-image" width="230" height="230" alt="휴대폰에서 첫 등록 화면을 여는 일회용 초대 QR 코드">
+          <p class="private-hint">10분 동안 유효한 비밀 초대권입니다. QR을 촬영하거나 외부에 공유·제출하지 마세요.</p>
+        </div>
       </div>
       <div id="t08-member" hidden>
         <div class="private-member-top"><div><p class="private-kicker">AUTHENTICATED</p><h3 id="t08-welcome"></h3></div>

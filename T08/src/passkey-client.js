@@ -1,4 +1,5 @@
 import { startRegistration, startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
+import QRCode from 'qrcode';
 
 const $ = (id) => document.getElementById(id);
 const message = $('t08-message');
@@ -98,6 +99,10 @@ async function register(labelId, first) {
   const response=await startRegistration({optionsJSON:options});
   await request('registration-verify',{challengeId,response,label,inviteToken:token});
   invitation=null;
+  $('t08-invite-qr').hidden = true;
+  $('t08-invite-qr-image').removeAttribute('src');
+  $('t08-show-invite-qr').setAttribute('aria-expanded', 'false');
+  $('t08-show-invite-qr').textContent = '휴대폰으로 등록 · QR 보기';
   await refresh();setMessage('패스키 등록 성공: 공개키만 서버에 저장되었습니다.');
 }
 $('t08-login').addEventListener('click',()=>run(async()=>{
@@ -112,6 +117,36 @@ $('t08-more-register').addEventListener('click',()=>run(()=>register('t08-more-l
 $('t08-logout').addEventListener('click',()=>run(async()=>{
   await request('logout',{});await refresh();setMessage('로그아웃했습니다. 기존 세션으로 비공개 자료를 요청하면 거절됩니다.');
 }));
+// 등록 초대 URL을 외부 서비스로 전송하지 않고 사용자의 브라우저에서 QR 이미지로 생성합니다.
+$('t08-show-invite-qr').addEventListener('click', async () => {
+  if (!invitation) {
+    setMessage('유효한 최초 등록 초대 링크를 먼저 열어 주세요.', true);
+    return;
+  }
+  const panel = $('t08-invite-qr');
+  const button = $('t08-show-invite-qr');
+  const image = $('t08-invite-qr-image');
+  if (!panel.hidden) {
+    image.removeAttribute('src');
+    panel.hidden = true;
+    button.setAttribute('aria-expanded', 'false');
+    button.textContent = '휴대폰으로 등록 · QR 보기';
+    return;
+  }
+  try {
+    const link = location.origin + location.pathname + location.search + '#invite=' + encodeURIComponent(invitation);
+    image.src = await QRCode.toDataURL(link, {
+      errorCorrectionLevel: 'M', width: 230, margin: 2,
+      color: { dark: '#302b27', light: '#fffdf8' },
+    });
+    panel.hidden = false;
+    button.setAttribute('aria-expanded', 'true');
+    button.textContent = 'QR 코드 숨기기';
+  } catch {
+    setMessage('QR 코드 표시 중 문제가 발생했습니다. 초대 링크를 휴대폰에서 직접 열어 주세요.', true);
+  }
+});
+
 refresh().catch(error=>{
   setVisible('t08-guest',true);
   setVisible('t08-invite',Boolean(invitation));
