@@ -111,3 +111,17 @@ test('expanded experience detail spans center and right without editing the orig
   assert.match(css, /\.strength\s*>\s*\.story\s+dl\s*\{[^}]*grid-template-columns:\s*repeat\(\s*2\s*,\s*minmax\(\s*0\s*,\s*1fr\s*\)\s*\)/s);
   assert.match(css, /max-width:\s*760px[\s\S]*?\.strength\s*>\s*\.story\s+dl\s*\{\s*display:\s*block\s*;/);
 });
+
+test('T08 page composition includes registration QR controls used by client', () => {
+  const fragment = read('snippets/private-room.html');
+  const html = read('public/index.html');
+  const browser = read('src/passkey-client.js');
+  const sync = read('scripts/sync-t01.mjs');
+  assert.ok(sync.includes("readFileSync('snippets/private-room.html'"));
+  for(const id of ['t08-show-invite-qr','t08-invite-qr','t08-invite-qr-image']) {
+    assert.ok(fragment.includes('id="' + id + '"'), id + ' missing from synced fragment');
+    assert.ok(html.includes('id="' + id + '"'), id + ' missing from committed page');
+    assert.ok(browser.includes("'"+id+"'"), id + ' missing from client');
+  }
+  assert.ok(fragment.includes('aria-controls="t08-invite-qr"'));
+});
