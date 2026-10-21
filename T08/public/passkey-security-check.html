@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <title>T08 인증 보안 실측</title>
+  <style>
+    :root{color-scheme:light;font-family:system-ui,-apple-system,sans-serif;background:#f6f2e9;color:#292723}
+    *{box-sizing:border-box}
+    main{max-width:550px;margin:8vh auto;padding:24px;background:#fff;border:1px solid #e6dfd6;border-radius:18px}
+    h1{font-size:1.4rem}p{line-height:1.65}label{display:block;margin:18px 0 6px}
+    select,button{font:inherit;padding:12px;border-radius:9px}select{width:100%;border:1px solid #bcb6ab}
+    button{margin:18px 0;background:#344137;color:white;border:0;width:100%;cursor:pointer}
+    button:disabled{opacity:.5;cursor:wait}
+    table{border-collapse:collapse;width:100%;margin-top:12px}td,th{border-bottom:1px solid #e9e4dc;padding:12px;text-align:left}
+    small{color:#666}#message{white-space:pre-wrap;overflow-wrap:anywhere}
+  </style>
+</head>
+<body>
+<main>
+  <h1>T08 · C30/C31 실측 검사</h1>
+  <p>휴대전화에 저장된 패스키로 <strong>한 번만 본인 인증</strong>합니다. 이후 서버에 실제 서명을 변조한 요청, 원본 정상 요청, 같은 원본의 재전송을 차례로 보내 차단 여부를 확인합니다.</p>
+  <label for="account">검사 계정</label>
+  <select id="account"><option value="owner">내 실습 계정</option><option value="reviewer">검증용 두 번째 계정</option></select>
+  <button id="start" type="button">패스키로 검사 시작</button>
+  <p id="message" role="status">휴대전화에서 실행하세요.</p>
+  <table aria-label="검사 결과"><thead><tr><th>검사</th><th>기대</th><th>실제</th></tr></thead><tbody id="results"></tbody></table>
+  <p><small>검사 과정의 인증 데이터는 서버 검증 요청에만 사용합니다. 서명, 패스키 ID, 쿠키를 화면이나 콘솔에 기록하지 않습니다. 완료 후 이 임시 검사 페이지는 삭제할 예정입니다.</small></p>
+  <p><a href="/">T08 본 화면으로 돌아가기</a></p>
+</main>
+<script>
+'use strict';
+const button=document.getElementById('start');
+const message=document.getElementById('message');
+const results=document.getElementById('results');
+function decode(value){
+  const input=value.replace(/-/g,'+').replace(/_/g,'/');
+  const binary=atob(input.padEnd(Math.ceil(input.length/4)*4,'='));
+  return Uint8Array.from(binary,c=>c.charCodeAt(0));
+}
+function encode(bytes){
+  let str='';for(const byte of bytes)str+=String.fromCharCode(byte);
+  return btoa(str).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function credentialJSON(cred){
+  if(typeof cred.toJSON==='function')return cred.toJSON();
+  return {
+    id:cred.id,rawId:encode(new Uint8Array(cred.rawId)),type:cred.type,
+    authenticatorAttachment:cred.authenticatorAttachment||undefined,
+    response:{
+      clientDataJSON:encode(new Uint8Array(cred.response.clientDataJSON)),
+      authenticatorData:encode(new Uint8Array(cred.response.authenticatorData)),
+      signature:encode(new Uint8Array(cred.response.signature)),
+      userHandle:cred.response.userHandle?encode(new Uint8Array(cred.response.userHandle)):null
+    },
+    clientExtensionResults:cred.getClientExtensionResults()
+  };
+}
+async function api(action,body){
+  const res=await fetch('/api?action='+encodeURIComponent(action),{
+    method:'POST',credentials:'same-origin',cache:'no-store',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify(body)
+  });
+  return {status:res.status,body:await res.json()};
+}
+function row(label,expected,actual){
+  const tr=document.createElement('tr');
+  for(const value of [label,expected,String(actual)]) {
+    const td=document.createElement('td');td.textContent=value;tr.append(td);
+  }
+  results.append(tr);
+}
+button.addEventListener('click',async()=>{
+  button.disabled=true;results.replaceChildren();
+  try {
+    if(!window.PublicKeyCredential||!navigator.credentials?.get)throw Error('휴대전화 브라우저에서 패스키를 사용할 수 없습니다.');
+    message.textContent='로그인 질문을 준비하고 있습니다…';
+    const begin=await api('authentication-options',{handle:document.getElementById('account').value});
+    row('로그인 질문','200',begin.status);
+    if(begin.status!==200)throw Error('로그인 질문 생성에 실패했습니다.');
+    const {challengeId,options}=begin.body;
+    const publicKey={
+      ...options,
+      challenge:decode(options.challenge),
+      allowCredentials:(options.allowCredentials||[]).map(c=>({...c,id:decode(c.id)}))
+    };
+    message.textContent='휴대전화 패스키 인증을 승인하세요.';
+    const credential=await navigator.credentials.get({publicKey});
+    if(!credential)throw Error('패스키 인증이 완료되지 않았습니다.');
+    const authentic=credentialJSON(credential);
+    const altered=JSON.parse(JSON.stringify(authentic));
+    const bytes=decode(altered.response.signature);
+    if(!bytes.length)throw Error('검사할 서명 값이 비어 있습니다.');
+    bytes[bytes.length-1]^=1;
+    altered.response.signature=encode(bytes);
+    message.textContent='변조·정상·재전송 응답을 순서대로 검사 중입니다…';
+    const invalid=await api('authentication-verify',{challengeId,response:altered});
+    row('서명 변조 차단','403',invalid.status);
+    if(invalid.status!==403)throw Error('서명 변조 검사 결과가 예상과 다릅니다. 이후 요청은 보내지 않았습니다.');
+    const payload={challengeId,response:authentic};
+    const accepted=await api('authentication-verify',payload);
+    row('실제 정상 인증','200',accepted.status);
+    if(accepted.status!==200)throw Error('정상 인증에 실패해 재전송을 실행하지 않았습니다.');
+    const replay=await api('authentication-verify',payload);
+    row('동일 요청 재전송','409',replay.status);
+    if(replay.status!==409)throw Error('재전송 검사 결과가 예상과 다릅니다.');
+    message.textContent='C30/C31 검사에 필요한 HTTP 응답을 확인했습니다. 위 결과 표만 캡처해 주세요.';
+  }catch(error){
+    message.textContent='검사 중단: '+(error?.name==='NotAllowedError'?'패스키 인증을 취소했습니다.':error.message||'알 수 없는 오류');
+  }finally{button.disabled=false;}
+});
+</script>
+</body>
+</html>

@@ -56,3 +56,14 @@ test('QR stays inside browser and account-specific challenge is signed on phone'
  assert.doesNotMatch(browser,/privateKey/);
  assert.match(read('snippets/private-room.html'),/USB 보안키 선택창을 사용하지 않습니다/);
 });
+
+test('C30/C31 temporary device test page uses a genuine signature, then replays identical payload', () => {
+  const page=read('public/passkey-security-check.html');
+  assert.match(page,/navigator\.credentials\.get\(\{publicKey\}\)/);
+  assert.match(page,/bytes\[bytes\.length-1\]\^=1/);
+  assert.match(page,/const invalid=await api\('authentication-verify'/);
+  assert.match(page,/const accepted=await api\('authentication-verify',payload\)/);
+  assert.match(page,/const replay=await api\('authentication-verify',payload\)/);
+  assert.match(page,/replay\.status!==409/);
+  assert.doesNotMatch(page,/localStorage|sessionStorage|console\.log/);
+});
