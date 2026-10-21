@@ -15,7 +15,8 @@
     "invite:reviewer": "node scripts/create-invite.mjs reviewer",
     "public-keys": "node scripts/show-public-keys.mjs",
     "check:public": "node scripts/check-public.mjs",
-    "test": "node --test tests/*.test.mjs"
+    "test": "node --test tests/*.test.mjs",
+    "migrate:phone": "node scripts/migrate-phone-login.mjs"
   },
   "dependencies": {
     "@simplewebauthn/server": "13.2.2",
