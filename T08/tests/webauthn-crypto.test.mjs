@@ -92,7 +92,8 @@ test('C30 simulated valid P-256 assertion succeeds; modified signature is reject
   const bytes=Buffer.from(altered.response.signature,'base64url');
   bytes[bytes.length-1]^=1;
   altered.response.signature=b64(bytes);
-  await assert.rejects(()=>verifyAuth(device,altered,challenge));
+  const invalid=await verifyAuth(device,altered,challenge);
+  assert.equal(invalid.verified,false);
 });
 test('C31 simulated replay with unchanged assertion counter is rejected', async () => {
   const device=fakeDevice(), challenge=b64(randomBytes(32));
