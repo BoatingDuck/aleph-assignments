@@ -36,6 +36,12 @@ function cookieName(config) { return config.secure ? '__Host-t08_session' : 't08
 function cookieLine(config, token, maxAge) {
   return `${cookieName(config)}=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${config.secure ? '; Secure' : ''}`;
 }
+function phoneCookieName(config) { return config.secure ? '__Host-t08_phone_pc' : 't08_phone_pc'; }
+function phoneCookieLine(config, token, maxAge) {
+  return `${phoneCookieName(config)}=${token}; Path=/; HttpOnly; SameSite=Strict; Max-Age=${maxAge}${config.secure ? '; Secure' : ''}`;
+}
+function validPhoneToken(value) { return typeof value === 'string' && /^[A-Za-z0-9_-]{43}$/.test(value); }
+
 async function getSession(req, sql, config) {
   const raw = parseCookies(req.headers.cookie || '')[cookieName(config)];
   if (!raw || !/^[A-Za-z0-9_-]{43}$/.test(raw)) return null;
@@ -164,7 +170,7 @@ async function loginBegin(sql, data, config) {
     VALUES (${challengeId},${account.id},'authenticate',${options.challenge},now() + interval '5 minutes')`;
   return {challengeId, options};
 }
-async function loginFinish(sql, res, data, config) {
+async function loginFinish(sql, res, data, config, approvedPair=null) {
   if (!isUuid(data.challengeId) || !data.response?.id || typeof data.response.id !== 'string') fail(400,'로그인 응답 형식 오류');
   const [challenge] = await sql`SELECT id,account_id,challenge FROM t08_challenges
     WHERE id=${data.challengeId} AND kind='authenticate' AND used_at IS NULL AND expires_at>now()`;
@@ -183,6 +189,27 @@ async function loginFinish(sql, res, data, config) {
   } catch { fail(403,'서명 또는 일회용 질문 검증에 실패했습니다.'); }
   if (!verification.verified) fail(403,'서명 검증 실패');
   const newCounter=verification.authenticationInfo.newCounter;
+  // A phone may authorize a pending PC sign-in but never receives the PC session.
+  // The same challenge consumption and signature-counter check still apply.
+  if (approvedPair) {
+    if (approvedPair.account_id !== challenge.account_id) fail(403,'다른 계정의 PC 로그인은 승인할 수 없습니다.');
+    const approved = await sql`
+      WITH consumed AS (
+        UPDATE t08_challenges SET used_at=now() WHERE id=${challenge.id}
+          AND account_id=${challenge.account_id} AND kind='authenticate'
+          AND used_at IS NULL AND expires_at>now() RETURNING account_id
+      ), updated AS (
+        UPDATE t08_passkeys SET counter=${newCounter},last_used_at=now()
+          WHERE id=${passkey.id} AND account_id=(SELECT account_id FROM consumed)
+            AND counter<=${newCounter} RETURNING account_id
+      )
+      UPDATE t08_phone_logins SET approved_at=now()
+        WHERE id=${approvedPair.id} AND account_id=(SELECT account_id FROM updated)
+          AND approved_at IS NULL AND consumed_at IS NULL AND expires_at>now()
+        RETURNING id`;
+    if (!approved.length) fail(409,'QR 요청 만료·재사용 또는 서명 카운터 충돌입니다.');
+    return {approved:true};
+  }
   const token = randomToken();
   // Only one request can consume the challenge; replay never creates a new session.
   const inserted = await sql`
@@ -217,6 +244,74 @@ async function deleteKey(sql, session, data) {
   if (!result.length) fail(409,'패스키를 찾지 못했거나 마지막 남은 패스키입니다. 마지막 패스키는 삭제할 수 없습니다.');
   return {deleted:true};
 }
+
+async function startPhoneLogin(sql, res, data, config) {
+  if (!['owner','reviewer'].includes(data.handle)) fail(400,'실습 계정을 선택하세요.');
+  const [account] = await sql`SELECT id FROM t08_accounts WHERE handle=${data.handle}`;
+  if (!account || !(await registeredKeys(sql,account.id)).length) fail(409,'선택한 계정에 등록된 패스키가 없습니다.');
+  const pairId=randomUUID(), pcToken=randomToken(), phoneToken=randomToken();
+  await sql`INSERT INTO t08_phone_logins(id,account_id,pc_token_hash,phone_token_hash,expires_at)
+    VALUES (${pairId},${account.id},${hashToken(pcToken)},${hashToken(phoneToken)},now()+interval '3 minutes')`;
+  res.setHeader('Set-Cookie',phoneCookieLine(config,pcToken,180));
+  return {pairId,phoneToken,expiresInSeconds:180};
+}
+async function getPhonePair(sql, data) {
+  if (!isUuid(data.pairId) || !validPhoneToken(data.phoneToken)) fail(400,'QR 로그인 요청이 올바르지 않습니다.');
+  const [pair]=await sql`SELECT id,account_id FROM t08_phone_logins
+    WHERE id=${data.pairId} AND phone_token_hash=${hashToken(data.phoneToken)}
+      AND expires_at>now() AND approved_at IS NULL AND consumed_at IS NULL`;
+  if (!pair) fail(410,'QR 요청이 만료되었거나 이미 사용되었습니다. PC에서 새 QR을 생성하세요.');
+  return pair;
+}
+async function preparePhoneLogin(sql, data, config) {
+  const pair=await getPhonePair(sql,data);
+  const [account]=await sql`SELECT handle FROM t08_accounts WHERE id=${pair.account_id}`;
+  if (!account) fail(410,'계정 정보가 만료되었습니다.');
+  const auth=await loginBegin(sql,{handle:account.handle},config);
+  return {...auth,handle:account.handle};
+}
+async function approvePhoneLogin(sql, res, data, config) {
+  const pair=await getPhonePair(sql,data);
+  return loginFinish(sql,res,data,config,pair);
+}
+async function pollPhoneLogin(req,sql,res,data,config) {
+  if (!isUuid(data.pairId)) fail(400,'QR 로그인 식별자가 올바르지 않습니다.');
+  const pcToken=parseCookies(req.headers.cookie||'')[phoneCookieName(config)];
+  if (!validPhoneToken(pcToken)) fail(401,'PC에서 시작한 QR 로그인 요청만 확인할 수 있습니다.');
+  const [pair]=await sql`SELECT id,approved_at FROM t08_phone_logins
+    WHERE id=${data.pairId} AND pc_token_hash=${hashToken(pcToken)}
+      AND consumed_at IS NULL AND expires_at>now()`;
+  if (!pair) return {state:'expired'};
+  if (!pair.approved_at) return {state:'pending'};
+  const token=randomToken();
+  const sessions=await sql`
+    WITH claimed AS (
+      UPDATE t08_phone_logins SET consumed_at=now()
+        WHERE id=${data.pairId} AND pc_token_hash=${hashToken(pcToken)}
+          AND approved_at IS NOT NULL AND consumed_at IS NULL AND expires_at>now()
+        RETURNING account_id
+    )
+    INSERT INTO t08_sessions(token_hash,account_id,expires_at)
+      SELECT ${hashToken(token)},account_id,now()+interval '12 hours' FROM claimed
+    RETURNING account_id`;
+  if (!sessions.length) return {state:'expired'};
+  res.setHeader('Set-Cookie',[
+    phoneCookieLine(config,'',0),
+    cookieLine(config,token,12*60*60)
+  ]);
+  return {state:'authenticated'};
+}
+async function cancelPhoneLogin(req,sql,res,data,config) {
+  if (!isUuid(data.pairId)) fail(400,'QR 로그인 식별자가 올바르지 않습니다.');
+  const pcToken=parseCookies(req.headers.cookie||'')[phoneCookieName(config)];
+  if (!validPhoneToken(pcToken)) fail(401,'PC의 요청이 아닙니다.');
+  await sql`UPDATE t08_phone_logins SET consumed_at=now()
+    WHERE id=${data.pairId} AND pc_token_hash=${hashToken(pcToken)}
+      AND consumed_at IS NULL AND expires_at>now()`;
+  res.setHeader('Set-Cookie',phoneCookieLine(config,'',0));
+  return {cancelled:true};
+}
+
 async function logout(sql, req, res, config) {
   const token = parseCookies(req.headers.cookie || '')[cookieName(config)];
   if (token) await sql`UPDATE t08_sessions SET revoked_at=now() WHERE token_hash=${hashToken(token)} AND revoked_at IS NULL`;
@@ -265,6 +360,11 @@ export default async function handler(req,res) {
     if (action==='registration-verify') return json(res,200,await registrationFinish(sql,req,res,session,data,config));
     if (action==='authentication-options') return json(res,200,await loginBegin(sql,data,config));
     if (action==='authentication-verify') return json(res,200,await loginFinish(sql,res,data,config));
+    if (action==='phone-start') return json(res,200,await startPhoneLogin(sql,res,data,config));
+    if (action==='phone-prepare') return json(res,200,await preparePhoneLogin(sql,data,config));
+    if (action==='phone-approve') return json(res,200,await approvePhoneLogin(sql,res,data,config));
+    if (action==='phone-poll') return json(res,200,await pollPhoneLogin(req,sql,res,data,config));
+    if (action==='phone-cancel') return json(res,200,await cancelPhoneLogin(req,sql,res,data,config));
     if (action==='logout') return json(res,200,await logout(sql,req,res,config));
     if (action==='passkey-delete') return json(res,200,await deleteKey(sql,session,data));
     if (action==='notes') {
