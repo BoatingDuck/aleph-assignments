@@ -1,5 +1,7 @@
 # T08 · Vercel ↔ Supabase TLS 신뢰 인증서 연결
 
+> **문제 해결 경위 기록:** TLS 오류를 추적하던 시기의 설정 방법입니다. 현재 운영 `/api?action=status`가 HTTP 200으로 DB에 연결되는 것은 확인됐습니다. 아래의 CA 설정은 재현 방법으로 남겨 둔 것이며, **지금 다시 변경해야 한다는 뜻이 아닙니다**.
+
 ## 문제
 배포된 API에서 `SELF_SIGNED_CERT_IN_CHAIN`이 발생하면 서버는 Supabase 연결의 TLS 인증서 체인을 검증할 수 없는 상태이다.
 
