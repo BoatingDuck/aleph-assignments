@@ -1,5 +1,6 @@
 import { startRegistration, startAuthentication, browserSupportsWebAuthn } from '@simplewebauthn/browser';
 import QRCode from 'qrcode';
+import { phoneAuthenticationOptions, passkeyErrorMessage } from './passkey-login.js';
 
 const $ = (id) => document.getElementById(id);
 const message = $('t08-message');
@@ -12,7 +13,7 @@ const setMessage = (text, error=false) => { message.textContent = text; message.
 const setVisible = (id, show) => { $(id).hidden = !show; };
 const markBusy = (isBusy) => {
   busy = isBusy;
-  for (const id of ['t08-login','t08-first-register','t08-more-register','t08-logout']) $(id).disabled = busy;
+  for (const id of ['t08-login','t08-phone-login','t08-first-register','t08-more-register','t08-logout']) $(id).disabled = busy;
   for (const button of document.querySelectorAll('#t08-keys button')) button.disabled = busy;
 };
 async function request(action, body=null, query={}) {
@@ -84,8 +85,7 @@ async function run(callback, registration=false) {
   markBusy(true);
   try {await callback();}
   catch(error) {
-    const cancelled=error.name==='NotAllowedError' || error.name==='AbortError';
-    setMessage(cancelled?(registration?'패스키 등록을 취소했습니다. 새 패스키는 서버에 저장되지 않았습니다.':'패스키 인증을 취소했습니다.'):error.message,true);
+    setMessage(passkeyErrorMessage(error, registration),true);
   } finally {markBusy(false);}
 }
 async function register(labelId, first) {
@@ -105,13 +105,20 @@ async function register(labelId, first) {
   $('t08-show-invite-qr').textContent = '휴대폰으로 등록 · QR 보기';
   await refresh();setMessage('패스키 등록 성공: 공개키만 서버에 저장되었습니다.');
 }
-$('t08-login').addEventListener('click',()=>run(async()=>{
-  if (!browserSupportsWebAuthn()) throw new Error('이 브라우저는 패스키를 지원하지 않습니다.');
-  const {challengeId,options}=await request('authentication-options',{handle:$('t08-account').value});
-  const response=await startAuthentication({optionsJSON:options});
-  await request('authentication-verify',{challengeId,response});
-  await refresh();setMessage('서명 확인 성공! 비공개 기록을 열었습니다.');
-}));
+function login(usePhone=false) {
+  return run(async()=>{
+    if (!browserSupportsWebAuthn()) throw new Error('이 브라우저는 패스키를 지원하지 않습니다.');
+    setMessage(usePhone
+      ? '휴대폰 인증을 준비합니다. 인증창에서 iPhone·Android 또는 다른 기기를 선택하고 QR을 스캔하세요.'
+      : '패스키 인증을 준비합니다.');
+    const {challengeId,options}=await request('authentication-options',{handle:$('t08-account').value});
+    const response=await startAuthentication({optionsJSON:usePhone?phoneAuthenticationOptions(options):options});
+    await request('authentication-verify',{challengeId,response});
+    await refresh();setMessage('서명 확인 성공! 비공개 기록을 열었습니다.');
+  });
+}
+$('t08-login').addEventListener('click',()=>login());
+$('t08-phone-login').addEventListener('click',()=>login(true));
 $('t08-first-register').addEventListener('click',()=>run(()=>register('t08-first-label',true),true));
 $('t08-more-register').addEventListener('click',()=>run(()=>register('t08-more-label',false),true));
 $('t08-logout').addEventListener('click',()=>run(async()=>{
