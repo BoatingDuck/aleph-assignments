@@ -5,10 +5,14 @@ import { phoneAuthenticationOptions, passkeyErrorMessage } from './passkey-login
 const $ = (id) => document.getElementById(id);
 const message = $('t08-message');
 if (!message) throw new Error('T08 비공개 영역이 없습니다.');
-let invitation = new URLSearchParams(location.hash.startsWith('#invite=') ? location.hash.slice(1) : '').get('invite');
-if (invitation) history.replaceState(null,'',location.pathname + location.search);
+const fragment = new URLSearchParams(location.hash.startsWith('#') ? location.hash.slice(1) : '');
+let invitation = fragment.get('invite');
+const phoneCode = fragment.get('phone');
+if (invitation || phoneCode) history.replaceState(null,'',location.pathname + location.search);
 let busy = false;
 let loggedIn = false;
+let pairing = null;
+let pairingTimer = null;
 const setMessage = (text, error=false) => { message.textContent = text; message.dataset.error = String(error); };
 const setVisible = (id, show) => { $(id).hidden = !show; };
 const markBusy = (isBusy) => {
@@ -105,6 +109,79 @@ async function register(labelId, first) {
   $('t08-show-invite-qr').textContent = '휴대폰으로 등록 · QR 보기';
   await refresh();setMessage('패스키 등록 성공: 공개키만 서버에 저장되었습니다.');
 }
+
+function phoneView() {
+  let panel=$('t08-phone-panel');
+  if(panel) return panel;
+  panel=document.createElement('div');
+  panel.id='t08-phone-panel';
+  panel.className='t08-phone-panel';
+  panel.hidden=true;
+  panel.innerHTML='<h4 id="t08-phone-title">휴대폰 패스키로 PC 로그인</h4><p id="t08-phone-status" role="status"></p><img id="t08-phone-image" width="230" height="230" alt="휴대폰 패스키 로그인 전용 일회성 QR 코드" hidden><button type="button" class="button outline" id="t08-phone-close">QR 인증 취소</button>';
+  $('t08-guest').append(panel);
+  $('t08-phone-close').addEventListener('click',()=>{stopPhonePair(true);});
+  return panel;
+}
+function stopPhonePair(cancel=false) {
+  if(pairingTimer) {clearInterval(pairingTimer);pairingTimer=null;}
+  const old=pairing;pairing=null;
+  const panel=$('t08-phone-panel');
+  if(panel) {panel.hidden=true;$('t08-phone-image').removeAttribute('src');}
+  if(cancel && old) request('phone-cancel',{pairId:old}).catch(()=>{});
+}
+async function beginPhoneQR() {
+  if(!browserSupportsWebAuthn()) throw new Error('PC 브라우저가 패스키 인증을 지원하지 않습니다.');
+  stopPhonePair(true);
+  const {pairId,phoneToken,expiresInSeconds}=await request('phone-start',{handle:$('t08-account').value});
+  pairing=pairId;
+  const panel=phoneView();panel.hidden=false;
+  $('t08-phone-title').textContent='휴대폰 카메라로 QR을 스캔하세요';
+  $('t08-phone-status').textContent='휴대폰에서 열리는 이 사이트에서 패스키 인증을 완료하면 PC 로그인이 열립니다. USB 보안키는 필요하지 않습니다.';
+  const link=location.origin+location.pathname+location.search+'#phone='+encodeURIComponent(pairId+'.'+phoneToken);
+  const image=$('t08-phone-image');
+  image.src=await QRCode.toDataURL(link,{width:230,margin:2,errorCorrectionLevel:'M'});
+  image.hidden=false;
+  const deadline=Date.now()+expiresInSeconds*1000;
+  let polling=false;
+  pairingTimer=setInterval(async()=>{
+    if(!pairing || polling)return;
+    if(Date.now()>=deadline) {stopPhonePair();setMessage('QR이 만료되었습니다. 새 QR로 다시 시도하세요.',true);return;}
+    polling=true;
+    try {
+      const status=await request('phone-poll',{pairId});
+      if(status.state==='authenticated'){
+        stopPhonePair();
+        await refresh();setMessage('휴대폰 패스키 인증 성공! PC에서 비공개 기록을 열었습니다.');
+      } else if(status.state==='expired') {
+        stopPhonePair();setMessage('QR 인증이 만료되었습니다. 새로 시작하세요.',true);
+      }
+    } catch(error) {stopPhonePair();setMessage(error.message,true);}
+    finally {polling=false;}
+  },2400);
+}
+async function approveFromPhone() {
+  if(!phoneCode) return;
+  const dot=phoneCode.indexOf('.');
+  const pairId=phoneCode.slice(0,dot),phoneToken=phoneCode.slice(dot+1);
+  const panel=phoneView();panel.hidden=false;
+  $('t08-phone-title').textContent='PC 로그인 승인';
+  $('t08-phone-image').hidden=true;
+  $('t08-phone-close').textContent='닫기';
+  $('t08-phone-status').textContent='PC에서 시작한 로그인 요청입니다. 이 사이트에서 본인이 시작한 로그인일 때만 승인하세요.';
+  const approve=document.createElement('button');
+  approve.type='button';approve.className='button solid';approve.textContent='내 휴대폰 패스키로 PC 로그인 승인';
+  panel.append(approve);
+  approve.addEventListener('click',()=>run(async()=>{
+    if(!browserSupportsWebAuthn())throw new Error('이 휴대폰은 패스키 인증을 지원하지 않습니다.');
+    const {challengeId,options,handle}=await request('phone-prepare',{pairId,phoneToken});
+    $('t08-phone-status').textContent='선택된 실습 계정: '+(handle==='owner'?'내 실습 계정':'검증용 두 번째 계정');
+    const response=await startAuthentication({optionsJSON:options});
+    await request('phone-approve',{pairId,phoneToken,challengeId,response});
+    approve.disabled=true;
+    $('t08-phone-status').textContent='승인 완료. PC로 돌아가면 자동으로 로그인됩니다.';
+    setMessage('휴대폰 패스키 서명을 확인했습니다. 이제 PC에서 로그인할 수 있습니다.');
+  }));
+}
 function login(usePhone=false) {
   return run(async()=>{
     if (!browserSupportsWebAuthn()) throw new Error('이 브라우저는 패스키를 지원하지 않습니다.');
@@ -118,7 +195,7 @@ function login(usePhone=false) {
   });
 }
 $('t08-login').addEventListener('click',()=>login());
-$('t08-phone-login').addEventListener('click',()=>login(true));
+$('t08-phone-login').addEventListener('click',()=>beginPhoneQR().catch(error=>setMessage(error.message,true)));
 $('t08-first-register').addEventListener('click',()=>run(()=>register('t08-first-label',true),true));
 $('t08-more-register').addEventListener('click',()=>run(()=>register('t08-more-label',false),true));
 $('t08-logout').addEventListener('click',()=>run(async()=>{
@@ -154,7 +231,7 @@ $('t08-show-invite-qr').addEventListener('click', async () => {
   }
 });
 
-refresh().catch(error=>{
+refresh().then(()=>approveFromPhone()).catch(error=>{
   setVisible('t08-guest',true);
   setVisible('t08-invite',Boolean(invitation));
   setVisible('t08-member',false);
