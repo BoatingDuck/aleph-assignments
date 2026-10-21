@@ -118,7 +118,7 @@ function phoneView() {
   panel.className='t08-phone-panel';
   panel.hidden=true;
   panel.innerHTML='<h4 id="t08-phone-title">휴대폰 패스키로 PC 로그인</h4><p id="t08-phone-status" role="status"></p><img id="t08-phone-image" width="230" height="230" alt="휴대폰 패스키 로그인 전용 일회성 QR 코드" hidden><button type="button" class="button outline" id="t08-phone-close">QR 인증 취소</button>';
-  $('t08-guest').append(panel);
+  document.querySelector('.private-panel').append(panel);
   $('t08-phone-close').addEventListener('click',()=>{stopPhonePair(true);});
   return panel;
 }
