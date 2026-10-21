@@ -1,0 +1,33 @@
+name: T08 QR Passkey CI
+on:
+  pull_request:
+    paths:
+      - 'T08/**'
+      - '.github/workflows/t08-qr-ci.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'T08/**'
+      - '.github/workflows/t08-qr-ci.yml'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: T08/package-lock.json
+      - name: Install locked dependencies
+        working-directory: T08
+        run: npm ci
+      - name: Rebuild existing T01 and T08 public site
+        working-directory: T08
+        run: npm run sync:t01
+      - name: Build WebAuthn browser bundle
+        working-directory: T08
+        run: npm run build
+      - name: Node tests
+        working-directory: T08
+        run: npm test
