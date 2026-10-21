@@ -49,6 +49,19 @@ CREATE TABLE IF NOT EXISTS t08_sessions (
 );
 CREATE INDEX IF NOT EXISTS t08_sessions_account_idx ON t08_sessions(account_id);
 
+-- One-time PC/mobile handoff. The mobile device must still complete WebAuthn.
+-- Store only hashes of the two independent high-entropy tokens.
+CREATE TABLE IF NOT EXISTS t08_phone_logins (
+  id UUID PRIMARY KEY,
+  account_id UUID NOT NULL REFERENCES t08_accounts(id) ON DELETE CASCADE,
+  pc_token_hash TEXT NOT NULL UNIQUE,
+  phone_token_hash TEXT NOT NULL UNIQUE,
+  expires_at TIMESTAMPTZ NOT NULL,
+  approved_at TIMESTAMPTZ,
+  consumed_at TIMESTAMPTZ
+);
+CREATE INDEX IF NOT EXISTS t08_phone_logins_expires_idx ON t08_phone_logins(expires_at);
+
 -- Supabase: no browser/anon/authenticated role may read WebAuthn credentials,
 -- invitations, challenges, sessions, or private notes through PostgREST.
 -- Only the server's PostgreSQL connection is used for this T08 application.
@@ -58,5 +71,7 @@ ALTER TABLE public.t08_passkeys ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.t08_invites ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.t08_challenges ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.t08_sessions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.t08_phone_logins ENABLE ROW LEVEL SECURITY;
 REVOKE ALL ON TABLE public.t08_accounts, public.t08_notes, public.t08_passkeys,
-  public.t08_invites, public.t08_challenges, public.t08_sessions FROM anon, authenticated;
+  public.t08_invites, public.t08_challenges, public.t08_sessions,
+  public.t08_phone_logins FROM anon, authenticated;
