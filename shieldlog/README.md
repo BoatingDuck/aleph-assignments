@@ -30,7 +30,7 @@ Node.js 18 이상에서 다음 명령어를 실행합니다.
 npm test
 ```
 
-`tests/engine.test.mjs`는 탐지 임계값, 시간 창, CSV 따옴표 처리, 유효하지 않은 시간값, JSON 래퍼, 샘플 데이터 재현, 공격 위험 문자열 입력을 검증하는 10개의 단위 테스트를 포함합니다.
+`tests/engine.test.mjs`는 탐지 임계값, 시간 창, CSV 따옴표 처리, 유효하지 않은 시간값, JSON 래퍼, 샘플 데이터 재현, 공격 위험 문자열 입력을 검증하는 12개의 단위 테스트를 포함합니다.
 
 ## 입력 파일 사양
 
@@ -76,7 +76,7 @@ Vercel에는 원본 `index.html`에 `styles.css`, `engine.mjs`, `app.mjs`를 동
 
 ## 검증 상태
 
-- 자동 테스트 10/10 PASS
+- 자동 테스트 12/12 PASS
 - Chromium 브라우저에서 대시보드·4개 사건·상태 저장 및 재조회·검색·CSV 가져오기·모바일 메뉴 확인
 - Vercel API를 통해 프로덕션 READY 및 공식 URL 연결 확인
 - Vercel 배포 URL 조회로 프로덕션 주소의 HTTP 200 OK와 앱 HTML 원문 반환 확인. 익명 사용자 브라우저에서의 최종 렌더링은 제출자가 직접 확인 권장
@@ -87,4 +87,14 @@ Vercel에는 원본 `index.html`에 `styles.css`, `engine.mjs`, `app.mjs`를 동
 
 ## GitHub 소스 관리
 
-GitHub 저장 위치는 `BoatingDuck/aleph-assignments` 저장소의 `shieldlog/` 폴더입니다. 원본 정적 파일을 Vercel에 연결할 때는 프로젝트 루트에 있는 `index.html`, `app.mjs`, `engine.mjs`, `styles.css` 및 `vercel.json`을 그대로 배포합니다. 기존 운영 중인 `shieldlog-premium.vercel.app` 도메인은 배포 주소이며 GitHub 저장소 이름과는 독립적입니다.
+GitHub 원본 소스는 [`BoatingDuck/aleph-assignments/shieldlog`](https://github.com/BoatingDuck/aleph-assignments/tree/main/shieldlog)에 보관합니다. 원본 정적 파일을 Vercel에 연결할 때는 프로젝트 루트에 있는 `index.html`, `app.mjs`, `engine.mjs`, `styles.css` 및 `vercel.json`을 그대로 배포합니다. 기존 운영 중인 `shieldlog-premium.vercel.app` 도메인은 배포 주소이며 GitHub 저장소 이름과는 독립적입니다.
+
+## 2차 점검 업데이트 (v1.1)
+
+- CSV/JSON 전체 파일 가져오기, 브라우저 저장과 문서 다시 불러오기 후 조사 메모 복원, 사건 보고서(Markdown)/원본 CSV 다운로드를 Chromium에서 회귀 검증했습니다.
+- 모바일 390px에서 사이드바 열기/사건 목록 이동과 수평 스크롤 없는 표시를 확인했습니다.
+- 입력 로그의 HTTP 상태값이 누락되었을 때 성공(`200`)으로 간주되던 문제를 고쳤습니다. 이제 상태를 알 수 없음을 `N/A`로 표시합니다.
+- 테스트 결과와 점검 입력란 초안은 `docs/CHECKPOINT_2.md`, 상세 실행 결과는 `docs/CHECKPOINT_2_RESULTS.md`에서 확인할 수 있습니다.
+- 브라우저 자동화는 로컬 인라인 문서와 테스트용 저장소 모의 객체를 사용했습니다. 이는 공개 URL의 실사용자 브라우저 환경에서의 저장 지속 여부에 대한 보증과 구별합니다.
+
+브라우저 동작의 재현용 코드는 `tests/browser_smoke.py`에 있습니다(Python Playwright 및 로컬 Chromium 필요). 테스트용 로컬 저장 모의 구현이 포함되어 있으므로 실제 사용자 브라우저 영속성 검증과는 구별합니다.

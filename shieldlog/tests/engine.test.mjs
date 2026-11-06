@@ -12,3 +12,14 @@ test('JSON events wrapper is accepted',()=>{assert.equal(parseLogFile(JSON.strin
 test('reject unsupported format, malicious large imports and invalid timestamps',()=>{assert.throws(()=>parseLogFile('x','foo.txt'));assert.throws(()=>parseLogFile('x'.repeat(2000001),'a.csv'));assert.equal(normalizeEvent({timestamp:'oops'},0),null);});
 test('incident evidence IDs refer to original log events',()=>{const events=[0,1,2,3,4].map(i=>item(i));const alarm=detect(events).find(x=>x.rule==='BRUTE_FORCE');assert.deepEqual(alarm.evidence,events.map(x=>x.id));});
 test('timestamps and CSV formula strings stay as data',()=>{const csv='timestamp,ip,username,path,status\n2026-11-06T03:00:00Z,203.0.113.1,"=cmd",/login,401';assert.equal(parseLogFile(csv,'x.csv').events[0].user,'=cmd');});
+
+test('missing status is unknown rather than successful HTTP 200',()=>{
+  const event=normalizeEvent({timestamp:t,ip:'203.0.113.1',path:'/x'});
+  assert.equal(event.status,0);
+  assert.equal(normalizeEvent({timestamp:t,status:'',path:'/x'}).status,0);
+  assert.equal(normalizeEvent({timestamp:t,status:'NaN',path:'/x'}).status,0);
+});
+test('known HTTP statuses remain unchanged after normalization',()=>{
+  assert.equal(normalizeEvent({timestamp:t,status:'401',path:'/login'}).status,401);
+  assert.equal(normalizeEvent({timestamp:t,status:200,path:'/'}).status,200);
+});

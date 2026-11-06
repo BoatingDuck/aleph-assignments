@@ -20,7 +20,8 @@ export function normalizeEvent(raw,index=0){
   if(!ipPattern.test(ip)) ip='unknown';
   const user=safeText(raw.username??raw.user??raw.account??'-',80)||'-';
   const path=safeText(raw.path??raw.url??raw.request??'/',240)||'/';
-  const num=Number(raw.status??raw.statusCode??raw.status_code??200);
+  const rawStatus=raw.status??raw.statusCode??raw.status_code;
+  const num=rawStatus==null||String(rawStatus).trim()===''?NaN:Number(rawStatus);
   const status=Number.isInteger(num)&&num>=100&&num<=599?num:0;
   return {id:`evt-${index}`,timestamp:new Date(ms).toISOString(),time:ms,ip,user,path,method:safeText(raw.method??'GET',12).toUpperCase(),status,message:safeText(raw.message??raw.reason??'',240)};
 }

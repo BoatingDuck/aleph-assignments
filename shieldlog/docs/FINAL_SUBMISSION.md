@@ -28,10 +28,13 @@ AI에게 기획 정리, 탐지 규칙과 인터페이스 구현, 파일 입출�
 ## 제출 링크
 
 - 결과물 URL: https://shieldlog-premium.vercel.app/
-- 소스 저장소 URL(선택): 없음 — 제출용 ZIP에 전체 코드 포함
+- 소스 저장소 URL: https://github.com/BoatingDuck/aleph-assignments/tree/main/shieldlog
 - 계획 설계서: `plan.md`
 - 원본 소스 및 증빙: `ShieldLog_프리미엄실습_최종제출.zip`
 
 ## 정직한 검증 범위
 
-자체 단위 테스트 10개와 로컬 Chromium UI 테스트를 통과했고, Vercel API가 프로덕션 READY 및 연결 도메인을 확인했습니다. Vercel URL 조회에서 HTTP 200 OK와 앱 HTML 반환까지 확인했습니다. 제출자 브라우저에서의 최종 화면 검수는 별도입니다.
+자체 단위 테스트 12개와 로컬 Chromium UI 테스트를 통과했고, Vercel API가 프로덕션 READY 및 연결 도메인을 확인했습니다. Vercel URL 조회에서 HTTP 200 OK와 앱 HTML 반환까지 확인했습니다. 제출자 브라우저에서의 최종 화면 검수는 별도입니다.
+
+
+중간 점검 2차의 상세 검증 결과는 `docs/CHECKPOINT_2_RESULTS.md`에 있으며, 실제 외부 사용자 피드백은 별도 수집이 필요합니다.
