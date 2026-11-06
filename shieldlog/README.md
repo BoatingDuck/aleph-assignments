@@ -108,3 +108,9 @@ GitHub 원본 소스는 [`BoatingDuck/aleph-assignments/shieldlog`](https://gith
 - 기능 스크린샷: `docs/final-case-detail.png`, `docs/final-events.png`
 
 외부 사용자 리뷰와 실제 배포 origin 저장 지속성은 자동화로 확인하지 않았으며, 문서에 남은 수동 점검 항목을 참조하세요.
+## 화면 가독성·모션 개선 (v1.2)
+
+- 작은 설명·표·사건명 텍스트의 크기를 올리고 대비를 보완했다.
+- 카드 진입·페이지 전환·그래프 드로잉에 짧은 모션을 추가했다.
+- 모바일 320~390px에서 가로 넘침을 보정하고, 움직임 줄이기 설정을 존중했다.
+- 검증 내역: `docs/UI_REFINEMENT_VALIDATION.md`, 재현 스크립트: `tests/ui_refinement_smoke.py`.
