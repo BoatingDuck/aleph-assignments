@@ -40,3 +40,9 @@
 - JavaScript 페이지 실행 예외 **0건**
 - 이전 단락의 10/10은 1차 시점의 결과이며, 현재 최종 테스트 결과는 12/12입니다.
 - 상세 범위와 로컬 저장 모의 객체 사용의 한계는 `docs/CHECKPOINT_2_RESULTS.md`를 참조하세요.
+
+## 2차 프로덕션 배포 상태 (2026-11-06)
+
+- 2차 업데이트 Deployment ID: `dpl_HcPskC2P6n7WxKcPQkbiRkgwB5G9`
+- Vercel API 확인: `READY` / `production` / 공식 도메인 2개 연결
+- 외부 웹 조회로 HTML 본문 접근은 확인하지 못했습니다. 배포가 READY라는 사실을 화면 실행 성공과 혼동하지 않습니다.

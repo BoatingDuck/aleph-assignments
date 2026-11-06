@@ -39,3 +39,11 @@ python tests/browser_smoke.py
 ```
 
 캡처 결과는 `docs/checkpoint2-desktop.jpg`, `docs/checkpoint2-mobile.jpg`에 보관했습니다. UI의 사건 수치는 가상 로그를 기준으로 합니다.
+
+## 최신 프로덕션 배포 점검
+
+- 2차 업데이트 배포 ID: `dpl_HcPskC2P6n7WxKcPQkbiRkgwB5G9`
+- 배포 환경: Production / `READY` (Vercel 배포 API 확인)
+- 공식 도메인 연결: `shieldlog-premium.vercel.app`, `shieldlog-premium-boating-duck.vercel.app`
+- 새 빌드는 분리된 정적 소스 `index.html`, `app.mjs`, `engine.mjs`, `styles.css` 등을 사용합니다.
+- 외부 웹페이지 조회 도구에서 프로덕션 HTML을 직접 열지 못해, 실제 공개 사용자 브라우저에서의 정상 렌더링은 **최종 수동 확인 항목**으로 남겨둡니다.
