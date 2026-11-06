@@ -1,0 +1,12 @@
+{
+  "name": "shieldlog",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test tests/*.test.mjs",
+    "serve": "python -m http.server 8000"
+  },
+  "description": "브라우저 내 로그 분석·보안 사건 대응 워크벤치",
+  "license": "UNLICENSED"
+}

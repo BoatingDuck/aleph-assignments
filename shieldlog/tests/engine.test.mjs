@@ -1,0 +1,14 @@
+import test from 'node:test';import assert from 'node:assert/strict';
+import {normalizeEvent,parseCSV,parseLogFile,detect,generateDemo} from '../engine.mjs';
+const t='2026-11-06T03:00:00.000Z';
+const item=(i,ip='203.0.113.20',user='admin',path='/login',status=401)=>normalizeEvent({timestamp:new Date(Date.parse(t)+i*60000).toISOString(),ip,username:user,path,status},i);
+test('demo produces 4 rule families and stable counts',()=>{const events=generateDemo(Date.parse('2026-11-06T09:00:00Z'));const names=new Set(detect(events).map(x=>x.rule));assert.deepEqual([...names].sort(),['BRUTE_FORCE','CREDENTIAL_SPRAY','ERROR_BURST','PATH_PROBE']);});
+test('brute force threshold requires five errors within ten minutes',()=>{assert.equal(detect([0,1,2,3].map(i=>item(i))).length,0);assert(detect([0,1,2,3,4].map(i=>item(i))).some(x=>x.rule==='BRUTE_FORCE'));});
+test('events separated by more than the rolling window do not trigger',()=>{assert.equal(detect([0,12,24,36,48].map(i=>item(i))).length,0);});
+test('failure must be authentic and path probe distinct',()=>{assert.equal(detect([0,1,2,3,4,5].map(i=>item(i,'203.0.113.1','a','/login',200))).length,0);assert.equal(detect([0,1,2,3,4,5].map(i=>item(i,'203.0.113.1','a','/.env',404))).filter(x=>x.rule==='PATH_PROBE').length,0);});
+test('CSV escaped quotes and embedded newlines are parsed',()=>{const csv='timestamp,ip,username,path,status,message\n2026-11-06T03:00:00Z,203.0.113.9,test,/login,401,"bad, ""password""\nretry"';const rows=parseCSV(csv);assert.equal(rows[0].message,'bad, "password"\nretry');});
+test('CSV import counts invalid rows',()=>{const csv='timestamp,ip,username,path,status\n2026-11-06T03:00:00Z,203.0.113.9,t,/login,401\nnope,203.0.113.9,t,/login,401';const parsed=parseLogFile(csv,'events.csv');assert.equal(parsed.events.length,1);assert.equal(parsed.skipped,1);});
+test('JSON events wrapper is accepted',()=>{assert.equal(parseLogFile(JSON.stringify({events:[{timestamp:t,ip:'192.0.2.1'}]}),'events.json').events.length,1);});
+test('reject unsupported format, malicious large imports and invalid timestamps',()=>{assert.throws(()=>parseLogFile('x','foo.txt'));assert.throws(()=>parseLogFile('x'.repeat(2000001),'a.csv'));assert.equal(normalizeEvent({timestamp:'oops'},0),null);});
+test('incident evidence IDs refer to original log events',()=>{const events=[0,1,2,3,4].map(i=>item(i));const alarm=detect(events).find(x=>x.rule==='BRUTE_FORCE');assert.deepEqual(alarm.evidence,events.map(x=>x.id));});
+test('timestamps and CSV formula strings stay as data',()=>{const csv='timestamp,ip,username,path,status\n2026-11-06T03:00:00Z,203.0.113.1,"=cmd",/login,401';assert.equal(parseLogFile(csv,'x.csv').events[0].user,'=cmd');});

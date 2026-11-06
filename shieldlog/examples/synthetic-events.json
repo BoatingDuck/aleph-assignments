@@ -1,0 +1,1352 @@
+[
+  {
+    "timestamp": "2026-11-06T03:00:00.000Z",
+    "ip": "192.0.2.10",
+    "username": "visitor",
+    "path": "/",
+    "status": 404,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:01:15.000Z",
+    "ip": "192.0.2.19",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:02:30.000Z",
+    "ip": "198.51.100.12",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:03:45.000Z",
+    "ip": "198.51.100.20",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:05:00.000Z",
+    "ip": "203.0.113.7",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:06:15.000Z",
+    "ip": "192.0.2.10",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:07:30.000Z",
+    "ip": "192.0.2.19",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:08:45.000Z",
+    "ip": "198.51.100.12",
+    "username": "member",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:10:00.000Z",
+    "ip": "198.51.100.20",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:11:15.000Z",
+    "ip": "203.0.113.7",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:12:30.000Z",
+    "ip": "192.0.2.10",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:13:45.000Z",
+    "ip": "192.0.2.19",
+    "username": "operator",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:15:00.000Z",
+    "ip": "198.51.100.12",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:16:15.000Z",
+    "ip": "198.51.100.20",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:17:30.000Z",
+    "ip": "203.0.113.7",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:18:45.000Z",
+    "ip": "192.0.2.10",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:20:00.000Z",
+    "ip": "192.0.2.19",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:21:15.000Z",
+    "ip": "198.51.100.12",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:22:30.000Z",
+    "ip": "198.51.100.20",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:23:45.000Z",
+    "ip": "203.0.113.7",
+    "username": "member",
+    "path": "/login",
+    "status": 404,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:25:00.000Z",
+    "ip": "192.0.2.10",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:26:15.000Z",
+    "ip": "192.0.2.19",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:27:30.000Z",
+    "ip": "198.51.100.12",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:28:45.000Z",
+    "ip": "198.51.100.20",
+    "username": "operator",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:30:00.000Z",
+    "ip": "203.0.113.7",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:31:15.000Z",
+    "ip": "192.0.2.10",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:32:30.000Z",
+    "ip": "192.0.2.19",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:33:45.000Z",
+    "ip": "198.51.100.12",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:35:00.000Z",
+    "ip": "198.51.100.20",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:35:00.000Z",
+    "ip": "203.0.113.24",
+    "username": "admin",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "invalid password"
+  },
+  {
+    "timestamp": "2026-11-06T03:35:42.000Z",
+    "ip": "203.0.113.24",
+    "username": "admin",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "invalid password"
+  },
+  {
+    "timestamp": "2026-11-06T03:36:15.000Z",
+    "ip": "203.0.113.7",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:36:24.000Z",
+    "ip": "203.0.113.24",
+    "username": "admin",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "invalid password"
+  },
+  {
+    "timestamp": "2026-11-06T03:37:06.000Z",
+    "ip": "203.0.113.24",
+    "username": "admin",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "invalid password"
+  },
+  {
+    "timestamp": "2026-11-06T03:37:30.000Z",
+    "ip": "192.0.2.10",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:37:48.000Z",
+    "ip": "203.0.113.24",
+    "username": "admin",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "invalid password"
+  },
+  {
+    "timestamp": "2026-11-06T03:38:30.000Z",
+    "ip": "203.0.113.24",
+    "username": "admin",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "invalid password"
+  },
+  {
+    "timestamp": "2026-11-06T03:38:45.000Z",
+    "ip": "192.0.2.19",
+    "username": "member",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:39:12.000Z",
+    "ip": "203.0.113.24",
+    "username": "admin",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "invalid password"
+  },
+  {
+    "timestamp": "2026-11-06T03:40:00.000Z",
+    "ip": "198.51.100.12",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:41:15.000Z",
+    "ip": "198.51.100.20",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:42:30.000Z",
+    "ip": "203.0.113.7",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:43:45.000Z",
+    "ip": "192.0.2.10",
+    "username": "operator",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:45:00.000Z",
+    "ip": "192.0.2.19",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:46:15.000Z",
+    "ip": "198.51.100.12",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:47:30.000Z",
+    "ip": "198.51.100.20",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 404,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:48:45.000Z",
+    "ip": "203.0.113.7",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:50:00.000Z",
+    "ip": "192.0.2.10",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:51:15.000Z",
+    "ip": "192.0.2.19",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:52:30.000Z",
+    "ip": "198.51.100.12",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:53:45.000Z",
+    "ip": "198.51.100.20",
+    "username": "member",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:55:00.000Z",
+    "ip": "203.0.113.7",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:56:15.000Z",
+    "ip": "192.0.2.10",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:57:30.000Z",
+    "ip": "192.0.2.19",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T03:58:45.000Z",
+    "ip": "198.51.100.12",
+    "username": "operator",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:00:00.000Z",
+    "ip": "198.51.100.20",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:01:15.000Z",
+    "ip": "203.0.113.7",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:02:30.000Z",
+    "ip": "192.0.2.10",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:03:45.000Z",
+    "ip": "192.0.2.19",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:05:00.000Z",
+    "ip": "198.51.100.12",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:06:00.000Z",
+    "ip": "198.51.100.77",
+    "username": "-",
+    "path": "/.env",
+    "status": 403,
+    "method": "GET",
+    "message": "자동화된 경로 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:06:15.000Z",
+    "ip": "198.51.100.20",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:06:54.000Z",
+    "ip": "198.51.100.77",
+    "username": "-",
+    "path": "/.git/config",
+    "status": 404,
+    "method": "GET",
+    "message": "자동화된 경로 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:07:30.000Z",
+    "ip": "203.0.113.7",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:07:48.000Z",
+    "ip": "198.51.100.77",
+    "username": "-",
+    "path": "/wp-admin",
+    "status": 403,
+    "method": "GET",
+    "message": "자동화된 경로 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:08:42.000Z",
+    "ip": "198.51.100.77",
+    "username": "-",
+    "path": "/admin",
+    "status": 404,
+    "method": "GET",
+    "message": "자동화된 경로 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:08:45.000Z",
+    "ip": "192.0.2.10",
+    "username": "member",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:09:36.000Z",
+    "ip": "198.51.100.77",
+    "username": "-",
+    "path": "/server-status",
+    "status": 403,
+    "method": "GET",
+    "message": "자동화된 경로 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:10:00.000Z",
+    "ip": "192.0.2.19",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:10:30.000Z",
+    "ip": "198.51.100.77",
+    "username": "-",
+    "path": "/actuator/health",
+    "status": 404,
+    "method": "GET",
+    "message": "자동화된 경로 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:11:15.000Z",
+    "ip": "198.51.100.12",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 404,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:12:30.000Z",
+    "ip": "198.51.100.20",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:13:45.000Z",
+    "ip": "203.0.113.7",
+    "username": "operator",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:15:00.000Z",
+    "ip": "192.0.2.10",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:16:15.000Z",
+    "ip": "192.0.2.19",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:17:30.000Z",
+    "ip": "198.51.100.12",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:18:45.000Z",
+    "ip": "198.51.100.20",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:20:00.000Z",
+    "ip": "203.0.113.7",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:21:15.000Z",
+    "ip": "192.0.2.10",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:22:30.000Z",
+    "ip": "192.0.2.19",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:23:45.000Z",
+    "ip": "198.51.100.12",
+    "username": "member",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:25:00.000Z",
+    "ip": "198.51.100.20",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:26:15.000Z",
+    "ip": "203.0.113.7",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:27:30.000Z",
+    "ip": "192.0.2.10",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:28:45.000Z",
+    "ip": "192.0.2.19",
+    "username": "operator",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:30:00.000Z",
+    "ip": "198.51.100.12",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:31:00.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/0",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:31:15.000Z",
+    "ip": "198.51.100.20",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:31:15.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/1",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:31:30.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/2",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:31:45.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/3",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:32:00.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/4",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:32:15.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/5",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:32:30.000Z",
+    "ip": "203.0.113.7",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:32:30.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/6",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:32:45.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/7",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:33:00.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/8",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:33:15.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/9",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:33:30.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/10",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:33:45.000Z",
+    "ip": "192.0.2.10",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:33:45.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/11",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:34:00.000Z",
+    "ip": "203.0.113.88",
+    "username": "guest",
+    "path": "/missing/12",
+    "status": 404,
+    "method": "GET",
+    "message": "not found"
+  },
+  {
+    "timestamp": "2026-11-06T04:35:00.000Z",
+    "ip": "192.0.2.19",
+    "username": "member",
+    "path": "/",
+    "status": 404,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:36:15.000Z",
+    "ip": "198.51.100.12",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:37:30.000Z",
+    "ip": "198.51.100.20",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:38:45.000Z",
+    "ip": "203.0.113.7",
+    "username": "member",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:40:00.000Z",
+    "ip": "192.0.2.10",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:41:15.000Z",
+    "ip": "192.0.2.19",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:42:30.000Z",
+    "ip": "198.51.100.12",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:43:45.000Z",
+    "ip": "198.51.100.20",
+    "username": "operator",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:45:00.000Z",
+    "ip": "203.0.113.7",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:46:15.000Z",
+    "ip": "192.0.2.10",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:47:30.000Z",
+    "ip": "192.0.2.19",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:48:45.000Z",
+    "ip": "198.51.100.12",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:50:00.000Z",
+    "ip": "198.51.100.20",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:51:15.000Z",
+    "ip": "203.0.113.7",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:52:30.000Z",
+    "ip": "192.0.2.10",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:53:45.000Z",
+    "ip": "192.0.2.19",
+    "username": "member",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:55:00.000Z",
+    "ip": "198.51.100.12",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:56:15.000Z",
+    "ip": "198.51.100.20",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:57:30.000Z",
+    "ip": "203.0.113.7",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:58:45.000Z",
+    "ip": "192.0.2.10",
+    "username": "operator",
+    "path": "/login",
+    "status": 404,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T04:59:00.000Z",
+    "ip": "192.0.2.99",
+    "username": "alice",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T04:59:39.000Z",
+    "ip": "192.0.2.99",
+    "username": "bob",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T05:00:00.000Z",
+    "ip": "192.0.2.19",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:00:18.000Z",
+    "ip": "192.0.2.99",
+    "username": "charlie",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T05:00:57.000Z",
+    "ip": "192.0.2.99",
+    "username": "dana",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T05:01:15.000Z",
+    "ip": "198.51.100.12",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:01:36.000Z",
+    "ip": "192.0.2.99",
+    "username": "alice",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T05:02:15.000Z",
+    "ip": "192.0.2.99",
+    "username": "bob",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T05:02:30.000Z",
+    "ip": "198.51.100.20",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:02:54.000Z",
+    "ip": "192.0.2.99",
+    "username": "charlie",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T05:03:33.000Z",
+    "ip": "192.0.2.99",
+    "username": "dana",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T05:03:45.000Z",
+    "ip": "203.0.113.7",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:04:12.000Z",
+    "ip": "192.0.2.99",
+    "username": "alice",
+    "path": "/login",
+    "status": 401,
+    "method": "POST",
+    "message": "login failed"
+  },
+  {
+    "timestamp": "2026-11-06T05:05:00.000Z",
+    "ip": "192.0.2.10",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:06:15.000Z",
+    "ip": "192.0.2.19",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:07:30.000Z",
+    "ip": "198.51.100.12",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:08:45.000Z",
+    "ip": "198.51.100.20",
+    "username": "member",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:10:00.000Z",
+    "ip": "203.0.113.7",
+    "username": "operator",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:11:15.000Z",
+    "ip": "192.0.2.10",
+    "username": "visitor",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:12:30.000Z",
+    "ip": "192.0.2.19",
+    "username": "member",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:13:45.000Z",
+    "ip": "198.51.100.12",
+    "username": "operator",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:15:00.000Z",
+    "ip": "198.51.100.20",
+    "username": "visitor",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:16:15.000Z",
+    "ip": "203.0.113.7",
+    "username": "member",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:17:30.000Z",
+    "ip": "192.0.2.10",
+    "username": "operator",
+    "path": "/api/items",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:18:45.000Z",
+    "ip": "192.0.2.19",
+    "username": "visitor",
+    "path": "/login",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:20:00.000Z",
+    "ip": "198.51.100.12",
+    "username": "member",
+    "path": "/",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:21:15.000Z",
+    "ip": "198.51.100.20",
+    "username": "operator",
+    "path": "/dashboard",
+    "status": 200,
+    "method": "GET",
+    "message": "정상 요청"
+  },
+  {
+    "timestamp": "2026-11-06T05:22:30.000Z",
+    "ip": "203.0.113.7",
+    "username": "visitor",
+    "path": "/api/items",
+    "status": 404,
+    "method": "GET",
+    "message": "정상 요청"
+  }
+]
