@@ -46,4 +46,5 @@ python tests/browser_smoke.py
 - 배포 환경: Production / `READY` (Vercel 배포 API 확인)
 - 공식 도메인 연결: `shieldlog-premium.vercel.app`, `shieldlog-premium-boating-duck.vercel.app`
 - 새 빌드는 분리된 정적 소스 `index.html`, `app.mjs`, `engine.mjs`, `styles.css` 등을 사용합니다.
-- 외부 웹페이지 조회 도구에서 프로덕션 HTML을 직접 열지 못해, 실제 공개 사용자 브라우저에서의 정상 렌더링은 **최종 수동 확인 항목**으로 남겨둡니다.
+- Vercel 배포 URL 조회로 공개 주소의 `index.html`, `app.mjs`, `engine.mjs`, `styles.css`가 모두 HTTP **200 OK**를 반환했으며, 배포된 자바스크립트의 `N/A` 처리 코드까지 확인했습니다.
+- 실제 사용자 기기에서의 렌더링과 origin 저장 지속성은 별도 수동 검증 항목으로 남습니다.

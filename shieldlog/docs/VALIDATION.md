@@ -45,4 +45,5 @@
 
 - 2차 업데이트 Deployment ID: `dpl_HcPskC2P6n7WxKcPQkbiRkgwB5G9`
 - Vercel API 확인: `READY` / `production` / 공식 도메인 2개 연결
-- 외부 웹 조회로 HTML 본문 접근은 확인하지 못했습니다. 배포가 READY라는 사실을 화면 실행 성공과 혼동하지 않습니다.
+- Vercel 배포 URL 조회에서 공식 주소의 `/`, `/app.mjs`, `/engine.mjs`, `/styles.css` 각각 HTTP **200 OK**를 확인했고, 배포 코드에 2차 수정 내용이 반영되었음을 검증했습니다.
+- 사용자 브라우저의 실제 실행·저장 영속성은 별도 최종 수동 확인을 권장합니다.
