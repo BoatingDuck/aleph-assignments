@@ -72,7 +72,7 @@ shieldlog/
 
 ## 배포 및 소스의 차이
 
-현재 Vercel 프로덕션에는 `index.html`과 분리된 `styles.css`, `engine.mjs`, `app.mjs`, `favicon.svg`, `vercel.json`을 함께 정적 배포했습니다. `standalone.html`은 동일한 로직을 한 파일에 포함한 로컬/오프라인 검증용 참고본이며 현재 프로덕션의 진입 파일은 아닙니다. `vercel.json`의 CSP는 분리된 정적 파일 구조에 적용됩니다. GitHub 저장소의 `shieldlog/` 폴더와 Vercel 프로젝트 사이의 자동 배포 연결은 별도로 구성하지 않았으며, 2차 버전은 소스 파일로 직접 재배포했습니다.
+Vercel에는 원본 `index.html`에 `styles.css`, `engine.mjs`, `app.mjs`를 동일한 내용으로 내장한 **단일 HTML 빌드**를 배포했습니다. ZIP은 기능 유지·수정을 쉽게 하도록 원본 파일을 분리해 포함합니다. `standalone.html`도 ZIP에 포함하므로 배포판을 그대로 확인할 수 있습니다. `vercel.json`의 CSP는 분리된 정적 파일 배포용입니다.
 
 ## 검증 상태
 
@@ -98,3 +98,13 @@ GitHub 원본 소스는 [`BoatingDuck/aleph-assignments/shieldlog`](https://gith
 - 브라우저 자동화는 로컬 인라인 문서와 테스트용 저장소 모의 객체를 사용했습니다. 이는 공개 URL의 실사용자 브라우저 환경에서의 저장 지속 여부에 대한 보증과 구별합니다.
 
 브라우저 동작의 재현용 코드는 `tests/browser_smoke.py`에 있습니다(Python Playwright 및 로컬 Chromium 필요). 테스트용 로컬 저장 모의 구현이 포함되어 있으므로 실제 사용자 브라우저 영속성 검증과는 구별합니다.
+
+## 최종 제출(3/3) 자료 — 2026-11-06
+
+- 최종 발표: `ShieldLog_최종발표자료.pptx` (최종 제출 ZIP과 별도 다운로드 파일에 포함)
+- 최종 점검 문구: [`docs/FINAL_SUBMISSION.md`](docs/FINAL_SUBMISSION.md)
+- 검증 보고서: [`docs/FINAL_RELEASE_VALIDATION.md`](docs/FINAL_RELEASE_VALIDATION.md)
+- 3분 발표 대본: [`docs/FINAL_PRESENTATION_SCRIPT.md`](docs/FINAL_PRESENTATION_SCRIPT.md)
+- 기능 스크린샷: `docs/final-case-detail.png`, `docs/final-events.png`
+
+외부 사용자 리뷰와 실제 배포 origin 저장 지속성은 자동화로 확인하지 않았으며, 문서에 남은 수동 점검 항목을 참조하세요.
