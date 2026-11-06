@@ -72,7 +72,7 @@ shieldlog/
 
 ## 배포 및 소스의 차이
 
-Vercel에는 원본 `index.html`에 `styles.css`, `engine.mjs`, `app.mjs`를 동일한 내용으로 내장한 **단일 HTML 빌드**를 배포했습니다. ZIP은 기능 유지·수정을 쉽게 하도록 원본 파일을 분리해 포함합니다. `standalone.html`도 ZIP에 포함하므로 배포판을 그대로 확인할 수 있습니다. `vercel.json`의 CSP는 분리된 정적 파일 배포용입니다.
+현재 Vercel 프로덕션에는 `index.html`과 분리된 `styles.css`, `engine.mjs`, `app.mjs`, `favicon.svg`, `vercel.json`을 함께 정적 배포했습니다. `standalone.html`은 동일한 로직을 한 파일에 포함한 로컬/오프라인 검증용 참고본이며 현재 프로덕션의 진입 파일은 아닙니다. `vercel.json`의 CSP는 분리된 정적 파일 구조에 적용됩니다. GitHub 저장소의 `shieldlog/` 폴더와 Vercel 프로젝트 사이의 자동 배포 연결은 별도로 구성하지 않았으며, 2차 버전은 소스 파일로 직접 재배포했습니다.
 
 ## 검증 상태
 
